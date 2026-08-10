@@ -35,10 +35,10 @@ const STATUS_LABELS: Record<OrderRow["status"], string> = {
 };
 
 const STATUS_STYLES: Record<OrderRow["status"], string> = {
-  pendiente: "bg-amber-50 text-amber-700 ring-amber-600/20",
-  en_proceso: "bg-blue-50 text-blue-700 ring-blue-600/20",
-  completada: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
-  cancelada: "bg-slate-100 text-slate-500 ring-slate-500/20",
+  pendiente: "bg-kraft-100 text-kraft-700 ring-kraft-400/40",
+  en_proceso: "bg-ink-700/8 text-ink-700 ring-ink-700/20",
+  completada: "bg-olive-400/20 text-olive-700 ring-olive-500/30",
+  cancelada: "bg-kraft-50 text-ink-500/50 ring-kraft-300/50",
 };
 
 const emptyForm = {
@@ -148,7 +148,7 @@ export default function OrdersDashboard({
         <SummaryCard label="Total" value={summary.total} />
         <SummaryCard label="Pendientes" value={summary.byStatus.pendiente ?? 0} />
         <SummaryCard label="En proceso" value={summary.byStatus.en_proceso ?? 0} />
-        <SummaryCard label="Completadas" value={summary.byStatus.completada ?? 0} />
+        <SummaryCard label="Completadas" value={summary.byStatus.completada ?? 0} accent />
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -156,7 +156,7 @@ export default function OrdersDashboard({
           <select
             value={statusFilter}
             onChange={(e) => onStatusChange(e.target.value)}
-            className="rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-slate-500 focus:outline-none"
+            className="rounded-lg border border-kraft-300 bg-white px-3 py-2 text-sm text-ink-700 shadow-sm focus:border-olive-600 focus:outline-none"
           >
             <option value="">Todos los estatus</option>
             {Object.entries(STATUS_LABELS).map(([value, label]) => (
@@ -168,7 +168,7 @@ export default function OrdersDashboard({
           <select
             value={clientFilter}
             onChange={(e) => onClientChange(e.target.value)}
-            className="rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-slate-500 focus:outline-none"
+            className="rounded-lg border border-kraft-300 bg-white px-3 py-2 text-sm text-ink-700 shadow-sm focus:border-olive-600 focus:outline-none"
           >
             <option value="">Todos los clientes</option>
             {clients.map((c) => (
@@ -177,20 +177,20 @@ export default function OrdersDashboard({
               </option>
             ))}
           </select>
-          {loading && <span className="text-xs text-slate-400">Cargando...</span>}
+          {loading && <span className="text-xs text-ink-500/50">Cargando...</span>}
         </div>
 
         <button
           onClick={() => setShowForm(true)}
-          className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
+          className="rounded-full bg-gradient-to-br from-olive-400 to-olive-600 px-5 py-2 text-sm font-bold tracking-wide text-ink-700 shadow-[0_4px_14px_rgba(90,60,25,0.25)] transition hover:shadow-[0_6px_18px_rgba(90,60,25,0.35)]"
         >
           + Nueva orden
         </button>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-        <table className="min-w-full divide-y divide-slate-200 text-sm">
-          <thead className="bg-slate-50">
+      <div className="overflow-hidden rounded-xl border border-kraft-200 bg-white shadow-sm">
+        <table className="min-w-full divide-y divide-kraft-200 text-sm">
+          <thead className="bg-kraft-50">
             <tr>
               <Th>Orden</Th>
               <Th>Cliente</Th>
@@ -203,39 +203,39 @@ export default function OrdersDashboard({
               <Th>Estatus</Th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-kraft-100">
             {orders.length === 0 && (
               <tr>
-                <td colSpan={9} className="px-4 py-8 text-center text-slate-400">
+                <td colSpan={9} className="px-4 py-8 text-center text-ink-500/40">
                   No hay ordenes con estos filtros.
                 </td>
               </tr>
             )}
             {orders.map((o) => (
-              <tr key={o.id} className="hover:bg-slate-50">
-                <td className="px-4 py-3 font-medium text-slate-900">
+              <tr key={o.id} className="hover:bg-kraft-50/70">
+                <td className="px-4 py-3 font-medium text-ink-700">
                   {o.order_number}
                 </td>
-                <td className="px-4 py-3 text-slate-600">
+                <td className="px-4 py-3 text-ink-700/80">
                   {o.client_name ?? "-"}
                 </td>
-                <td className="px-4 py-3 text-slate-600">
+                <td className="px-4 py-3 text-ink-700/80">
                   <div>{o.part_name}</div>
                   {o.part_number && (
-                    <div className="text-xs text-slate-400">{o.part_number}</div>
+                    <div className="text-xs text-ink-500/50">{o.part_number}</div>
                   )}
                 </td>
-                <td className="px-4 py-3 text-slate-600">{o.lot_number ?? "-"}</td>
-                <td className="px-4 py-3 text-slate-600">{o.total_pieces}</td>
-                <td className="px-4 py-3 text-slate-600">
-                  <span className="text-emerald-600">{o.pieces_ok}</span>
+                <td className="px-4 py-3 text-ink-700/80">{o.lot_number ?? "-"}</td>
+                <td className="px-4 py-3 text-ink-700/80">{o.total_pieces}</td>
+                <td className="px-4 py-3 text-ink-700/80">
+                  <span className="text-olive-700">{o.pieces_ok}</span>
                   {" / "}
                   <span className="text-red-600">{o.pieces_ng}</span>
                 </td>
-                <td className="px-4 py-3 text-slate-600">
+                <td className="px-4 py-3 text-ink-700/80">
                   {o.inspector_name ?? "Sin asignar"}
                 </td>
-                <td className="px-4 py-3 text-slate-600">
+                <td className="px-4 py-3 text-ink-700/80">
                   {o.due_date ? new Date(o.due_date).toLocaleDateString("es-MX") : "-"}
                 </td>
                 <td className="px-4 py-3">
@@ -252,13 +252,13 @@ export default function OrdersDashboard({
       </div>
 
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4">
-          <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-lg">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-700/40 px-4">
+          <div className="w-full max-w-lg rounded-xl border border-kraft-200 bg-white p-6 shadow-lg">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-slate-900">Nueva orden de inspeccion</h2>
+              <h2 className="text-lg font-semibold text-ink-700">Nueva orden de inspeccion</h2>
               <button
                 onClick={() => setShowForm(false)}
-                className="text-slate-400 hover:text-slate-600"
+                className="text-ink-500/50 hover:text-ink-700"
                 aria-label="Cerrar"
               >
                 &times;
@@ -365,14 +365,14 @@ export default function OrdersDashboard({
                 <button
                   type="button"
                   onClick={() => setShowForm(false)}
-                  className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
+                  className="rounded-lg px-4 py-2 text-sm font-medium text-ink-700/70 hover:bg-kraft-100"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
+                  className="rounded-full bg-gradient-to-br from-olive-400 to-olive-600 px-5 py-2 text-sm font-bold text-ink-700 shadow-[0_4px_14px_rgba(90,60,25,0.25)] disabled:opacity-50"
                 >
                   {submitting ? "Creando..." : "Crear orden"}
                 </button>
@@ -385,18 +385,32 @@ export default function OrdersDashboard({
   );
 }
 
-function SummaryCard({ label, value }: { label: string; value: number }) {
+function SummaryCard({
+  label,
+  value,
+  accent,
+}: {
+  label: string;
+  value: number;
+  accent?: boolean;
+}) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <p className="text-xs text-slate-400">{label}</p>
-      <p className="mt-1 text-2xl font-semibold text-slate-900">{value}</p>
+    <div
+      className={`rounded-xl border p-4 shadow-sm ${
+        accent
+          ? "border-olive-500/30 bg-olive-400/10"
+          : "border-kraft-200 bg-white"
+      }`}
+    >
+      <p className="text-xs text-ink-500/60">{label}</p>
+      <p className="mt-1 text-2xl font-semibold text-ink-700">{value}</p>
     </div>
   );
 }
 
 function Th({ children }: { children: React.ReactNode }) {
   return (
-    <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+    <th className="px-4 py-2.5 text-left text-xs font-semibold tracking-wide text-ink-500/60 uppercase">
       {children}
     </th>
   );
@@ -415,7 +429,7 @@ function Field({
 }) {
   return (
     <div className={className}>
-      <label className="mb-1 block text-sm font-medium text-slate-700">
+      <label className="mb-1 block text-sm font-medium text-ink-700/80">
         {label} {required && <span className="text-red-500">*</span>}
       </label>
       {children}

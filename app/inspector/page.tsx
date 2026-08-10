@@ -15,7 +15,7 @@ export default async function InspectorHomePage() {
       userName={session.name}
       navItems={[{ label: "Mis ordenes", href: "/inspector" }]}
     >
-      <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500">
+      <div className="rounded-xl border border-dashed border-kraft-300 bg-white p-8 text-center text-ink-500/60">
         Este modulo esta en construccion. Pronto podras ver tus ordenes
         asignadas y capturar resultados OK/NG aqui.
       </div>

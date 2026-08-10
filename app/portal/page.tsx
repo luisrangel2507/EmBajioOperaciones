@@ -15,7 +15,7 @@ export default async function PortalHomePage() {
       userName={session.name}
       navItems={[{ label: "Mis ordenes", href: "/portal" }]}
     >
-      <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500">
+      <div className="rounded-xl border border-dashed border-kraft-300 bg-white p-8 text-center text-ink-500/60">
         Este modulo esta en construccion. Pronto podras ver el estatus de tus
         ordenes y descargar reportes y facturas aqui.
       </div>
