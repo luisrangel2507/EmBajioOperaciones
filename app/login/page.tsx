@@ -10,6 +10,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showForgotNote, setShowForgotNote] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -51,70 +52,127 @@ export default function LoginPage() {
         rel="stylesheet"
       />
 
-      <div className="eb-grid-lines" />
       <div className="eb-brand-tag">EmBajio Operaciones</div>
 
-      <div className="eb-login-card">
-        <div className="eb-corner tl" />
-        <div className="eb-corner tr" />
-        <div className="eb-corner bl" />
-        <div className="eb-corner br" />
-
-        <div className="eb-status-bar">
-          <span>Sistema activo</span>
-          <div className="eb-status-dot" />
-        </div>
-
-        <div className="eb-login-cols">
-          <div className="eb-login-form-col">
-            {error && <div className="eb-error-msg">{error}</div>}
-            <form onSubmit={handleSubmit} noValidate>
-              <div className="eb-form-row">
-                <label htmlFor="email">Correo</label>
-                <input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  autoCorrect="off"
-                  autoCapitalize="none"
-                  spellCheck={false}
-                  placeholder="tu@correo.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="eb-form-row">
-                <label htmlFor="password">Contrasena</label>
-                <input
-                  id="password"
-                  type="password"
-                  autoComplete="current-password"
-                  placeholder="********"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-              <button type="submit" className="eb-btn-login" disabled={loading}>
-                {loading ? "■  Verificando…" : "▶  Entrar"}
-              </button>
-            </form>
+      <div className="eb-login-frame">
+        <div className="eb-login-card">
+          <div className="eb-status-bar">
+            <span className="eb-status-dots">
+              <span />
+              <span />
+            </span>
+            Sistema activo
+            <span className="eb-status-dots">
+              <span />
+              <span />
+            </span>
           </div>
 
-          <div className="eb-login-brand-col">
-            <div className="eb-logo-mark">EB</div>
-            <div className="eb-logo-title">
-              EmBajio
-              <span>Operaciones</span>
+          <div className="eb-login-cols">
+            <div className="eb-login-brand-col">
+              <CubeIcon className="eb-logo-mark" />
+              <div className="eb-logo-title">
+                EmBajio
+                <span>Operaciones</span>
+              </div>
+              <div className="eb-logo-sub">
+                Inspeccion industrial
+                <br />
+                Powered by <strong>Alta Vibra</strong>
+              </div>
             </div>
-            <div className="eb-logo-sub">Inspeccion Industrial</div>
-            <div className="eb-brand-divider" />
-            <div className="eb-powered-by">
-              Powered by
-              <strong>Alta Vibra</strong>
+
+            <div className="eb-login-form-col">
+              {error && <div className="eb-error-msg">{error}</div>}
+              <form onSubmit={handleSubmit} noValidate>
+                <div className="eb-form-row">
+                  <label htmlFor="email">Correo electronico</label>
+                  <div className="eb-input-wrap">
+                    <MailIcon />
+                    <input
+                      id="email"
+                      type="email"
+                      autoComplete="email"
+                      autoCorrect="off"
+                      autoCapitalize="none"
+                      spellCheck={false}
+                      placeholder="usuario@embajio.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="eb-form-row">
+                  <label htmlFor="password">Contrasena</label>
+                  <div className="eb-input-wrap">
+                    <LockIcon />
+                    <input
+                      id="password"
+                      type="password"
+                      autoComplete="current-password"
+                      placeholder="********"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {showForgotNote ? (
+                  <p className="eb-forgot-note">
+                    Pide a tu administrador que restablezca tu contrasena.
+                  </p>
+                ) : (
+                  <button
+                    type="button"
+                    className="eb-forgot"
+                    onClick={() => setShowForgotNote(true)}
+                  >
+                    ¿Olvidaste tu contrasena?
+                  </button>
+                )}
+
+                <button type="submit" className="eb-btn-login" disabled={loading}>
+                  {loading ? "Verificando…" : "Entrar"}
+                </button>
+              </form>
             </div>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+function MailIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <rect x="2.5" y="4.5" width="19" height="15" rx="2.5" />
+      <path d="m3 6 9 6.5L21 6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function LockIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <rect x="4" y="10.5" width="16" height="10" rx="2.2" />
+      <path d="M7.5 10.5V7a4.5 4.5 0 0 1 9 0v3.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function CubeIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 48 48"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M24 4 43 15v18L24 44 5 33V15Z" />
+      <path d="M24 4v18M24 22 5 15M24 22l19-7M24 22v22" strokeLinecap="round" />
+    </svg>
   );
 }
