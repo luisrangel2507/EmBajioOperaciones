@@ -13,7 +13,7 @@
   background-size: cover;
   background-position: center;
   font-family: "Space Grotesk", sans-serif;
-  color: #d8eeff;
+  color: #3a2c1a;
   overflow: auto;
 }
 
@@ -25,7 +25,7 @@
   font-family: "Orbitron", monospace;
   font-size: 10px;
   font-weight: 700;
-  color: rgba(0, 200, 255, 0.55);
+  color: rgba(230, 210, 170, 0.75);
   letter-spacing: 3px;
   text-transform: uppercase;
   display: flex;
@@ -37,8 +37,8 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #00c8ff;
-  box-shadow: 0 0 8px #00c8ff;
+  background: #d4de3c;
+  box-shadow: 0 0 8px rgba(212, 222, 60, 0.8);
   animation: eb-pulse 2s ease-in-out infinite;
 }
 
@@ -54,30 +54,17 @@
   }
 }
 
-/* Marco exterior: simula el borde brillante con esquinas cortadas */
+/* Marco exterior: borde tipo carton, esquinas ligeramente redondeadas */
 .eb-login-frame {
   position: relative;
   z-index: 2;
   width: 660px;
   max-width: calc(100vw - 40px);
-  padding: 1.5px;
-  background: linear-gradient(
-    135deg,
-    rgba(0, 220, 255, 0.9),
-    rgba(0, 140, 220, 0.35)
-  );
-  clip-path: polygon(
-    26px 0,
-    calc(100% - 26px) 0,
-    100% 26px,
-    100% calc(100% - 26px),
-    calc(100% - 26px) 100%,
-    26px 100%,
-    0 calc(100% - 26px),
-    0 26px
-  );
+  padding: 3px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #8a6136, #d8b075 45%, #8a6136);
   box-shadow:
-    0 0 50px rgba(0, 200, 255, 0.3),
+    0 0 0 1px rgba(60, 38, 12, 0.35),
     0 30px 80px rgba(0, 0, 0, 0.65);
   opacity: 1;
   animation: eb-card-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -95,32 +82,40 @@
 }
 
 .eb-login-card {
-  clip-path: polygon(
-    24.5px 0,
-    calc(100% - 24.5px) 0,
-    100% 24.5px,
-    100% calc(100% - 24.5px),
-    calc(100% - 24.5px) 100%,
-    24.5px 100%,
-    0 calc(100% - 24.5px),
-    0 24.5px
-  );
-  background: rgba(6, 14, 30, 0.94);
-  backdrop-filter: blur(16px) saturate(1.3);
+  position: relative;
+  border-radius: 13px;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.05) 0 2px,
+      transparent 2px 9px
+    ),
+    linear-gradient(180deg, #d6ad76, #c99a63 55%, #bd8c56);
 }
 
+/* Franja de cinta de embalaje */
 .eb-status-bar {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
   padding: 13px 20px;
-  background: rgba(0, 20, 45, 0.75);
-  border-bottom: 1px solid rgba(0, 200, 255, 0.15);
+  background:
+    linear-gradient(
+      100deg,
+      rgba(255, 255, 255, 0.35) 0%,
+      rgba(255, 255, 255, 0.08) 35%,
+      rgba(255, 255, 255, 0.28) 60%,
+      rgba(255, 255, 255, 0.06) 100%
+    ),
+    #e8dcc0;
+  border-bottom: 1px dashed rgba(90, 60, 25, 0.35);
   font-family: "Orbitron", monospace;
   font-size: 12px;
   font-weight: 700;
-  color: #8fe6ff;
+  color: #4a3218;
   letter-spacing: 4px;
   text-transform: uppercase;
 }
@@ -132,11 +127,11 @@
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: rgba(0, 200, 255, 0.45);
+  background: rgba(90, 60, 25, 0.35);
 }
 .eb-status-dots span:last-child {
-  background: #00c8ff;
-  box-shadow: 0 0 6px #00c8ff;
+  background: #7a9a2e;
+  box-shadow: 0 0 6px rgba(122, 154, 46, 0.7);
   animation: eb-pulse 2s ease-in-out infinite;
 }
 
@@ -153,15 +148,15 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  border-right: 1px solid rgba(0, 200, 255, 0.14);
+  border-right: 1px dashed rgba(90, 60, 25, 0.35);
 }
 
 .eb-logo-mark {
   width: 46px;
   height: 46px;
   margin-bottom: 16px;
-  color: #00c8ff;
-  filter: drop-shadow(0 0 10px rgba(0, 200, 255, 0.5));
+  color: #4a3218;
+  filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.3));
 }
 
 .eb-logo-title {
@@ -169,24 +164,24 @@
   font-size: 17px;
   font-weight: 900;
   letter-spacing: 0.5px;
-  color: #f2fbff;
+  color: #3a2711;
   line-height: 1.25;
 }
 .eb-logo-title span {
   display: block;
-  color: #00c8ff;
+  color: #5c7a1e;
 }
 
 .eb-logo-sub {
   margin-top: 12px;
   font-size: 10.5px;
-  color: rgba(180, 220, 245, 0.55);
+  color: rgba(74, 50, 24, 0.65);
   letter-spacing: 0.5px;
   line-height: 1.5;
 }
 .eb-logo-sub strong {
-  color: rgba(0, 200, 255, 0.75);
-  font-weight: 600;
+  color: #4a3218;
+  font-weight: 700;
 }
 
 .eb-login-form-col {
@@ -197,8 +192,8 @@
 .eb-login label {
   display: block;
   font-size: 12px;
-  font-weight: 600;
-  color: rgba(216, 238, 255, 0.75);
+  font-weight: 700;
+  color: #4a3218;
   margin-bottom: 7px;
   letter-spacing: 0.3px;
 }
@@ -216,33 +211,31 @@
   left: 13px;
   width: 16px;
   height: 16px;
-  color: rgba(120, 200, 240, 0.6);
+  color: rgba(74, 50, 24, 0.55);
   pointer-events: none;
 }
 
 .eb-login input {
   width: 100%;
   padding: 12px 14px 12px 38px;
-  border: 1px solid rgba(0, 200, 255, 0.22);
-  border-radius: 10px;
+  border: 1px solid rgba(90, 60, 25, 0.3);
+  border-radius: 8px;
   font-size: 15px;
   font-family: "Space Grotesk", sans-serif;
-  color: #fff;
-  background: rgba(0, 25, 55, 0.5);
+  color: #3a2711;
+  background: rgba(247, 240, 224, 0.75);
   outline: none;
   transition:
     border-color 0.15s,
     box-shadow 0.15s;
 }
 .eb-login input::placeholder {
-  color: rgba(150, 190, 230, 0.4);
+  color: rgba(74, 50, 24, 0.4);
 }
 .eb-login input:focus {
-  border-color: rgba(0, 200, 255, 0.6);
-  box-shadow:
-    0 0 0 3px rgba(0, 200, 255, 0.08),
-    inset 0 0 16px rgba(0, 200, 255, 0.05);
-  background: rgba(0, 35, 70, 0.6);
+  border-color: rgba(90, 60, 25, 0.6);
+  box-shadow: 0 0 0 3px rgba(90, 60, 25, 0.1);
+  background: rgba(250, 245, 232, 0.95);
 }
 
 .eb-forgot {
@@ -250,7 +243,7 @@
   text-align: right;
   margin: -6px 0 16px;
   font-size: 12px;
-  color: rgba(140, 200, 235, 0.65);
+  color: rgba(74, 50, 24, 0.65);
   background: none;
   border: none;
   cursor: pointer;
@@ -258,13 +251,13 @@
   transition: color 0.15s;
 }
 .eb-forgot:hover {
-  color: #00c8ff;
+  color: #3a2711;
 }
 .eb-forgot-note {
   margin: -8px 0 16px;
   text-align: right;
   font-size: 11.5px;
-  color: rgba(140, 200, 235, 0.65);
+  color: rgba(74, 50, 24, 0.65);
 }
 
 .eb-btn-login {
@@ -272,8 +265,8 @@
   padding: 13px;
   border: none;
   border-radius: 999px;
-  background: linear-gradient(135deg, #00c8ff, #0090d8);
-  color: #04131f;
+  background: linear-gradient(135deg, #d4de3c, #a8b82a);
+  color: #23300a;
   font-family: "Orbitron", monospace;
   font-size: 13.5px;
   font-weight: 700;
@@ -281,10 +274,10 @@
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.15s;
-  box-shadow: 0 0 22px rgba(0, 200, 255, 0.35);
+  box-shadow: 0 4px 14px rgba(90, 60, 25, 0.35);
 }
 .eb-btn-login:hover:not(:disabled) {
-  box-shadow: 0 0 30px rgba(0, 200, 255, 0.55);
+  box-shadow: 0 6px 18px rgba(90, 60, 25, 0.45);
   transform: translateY(-1px);
 }
 .eb-btn-login:active:not(:disabled) {
@@ -296,9 +289,9 @@
 }
 
 .eb-error-msg {
-  background: rgba(255, 60, 60, 0.1);
-  color: #ff8888;
-  border: 1px solid rgba(255, 60, 60, 0.28);
+  background: rgba(180, 40, 30, 0.1);
+  color: #8a2418;
+  border: 1px solid rgba(180, 40, 30, 0.3);
   border-radius: 8px;
   padding: 9px 12px;
   font-size: 12.5px;
@@ -318,7 +311,7 @@
     gap: 14px;
     padding: 18px 20px;
     border-right: none;
-    border-bottom: 1px solid rgba(0, 200, 255, 0.14);
+    border-bottom: 1px dashed rgba(90, 60, 25, 0.35);
   }
   .eb-logo-mark {
     width: 34px;
