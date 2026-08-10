@@ -1,0 +1,90 @@
+-- EmBajioOperaciones ERP schema
+-- PostgreSQL
+
+-- USUARIOS Y ROLES
+CREATE TABLE IF NOT EXISTS clients (
+  id SERIAL PRIMARY KEY,
+  company_name VARCHAR(160) NOT NULL,
+  contact_name VARCHAR(120),
+  contact_email VARCHAR(160),
+  contact_phone VARCHAR(30),
+  billing_address TEXT,
+  created_at TIMESTAMP DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(120) NOT NULL,
+  email VARCHAR(160) UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  role VARCHAR(20) NOT NULL CHECK (role IN ('admin','inspector','cliente')),
+  client_id INTEGER REFERENCES clients(id),
+  active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS inspection_orders (
+  id SERIAL PRIMARY KEY,
+  order_number VARCHAR(30) UNIQUE NOT NULL,
+  client_id INTEGER REFERENCES clients(id),
+  part_name VARCHAR(160) NOT NULL,
+  part_number VARCHAR(80),
+  lot_number VARCHAR(80),
+  total_pieces INTEGER NOT NULL,
+  defect_criteria TEXT,
+  status VARCHAR(20) DEFAULT 'pendiente' CHECK (status IN ('pendiente','en_proceso','completada','cancelada')),
+  due_date DATE,
+  assigned_inspector_id INTEGER REFERENCES users(id),
+  created_by INTEGER REFERENCES users(id),
+  created_at TIMESTAMP DEFAULT now(),
+  completed_at TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS inspection_results (
+  id SERIAL PRIMARY KEY,
+  order_id INTEGER REFERENCES inspection_orders(id),
+  inspector_id INTEGER REFERENCES users(id),
+  pieces_ok INTEGER DEFAULT 0,
+  pieces_ng INTEGER DEFAULT 0,
+  defect_type VARCHAR(120),
+  notes TEXT,
+  inspected_at TIMESTAMP DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS lot_tracking (
+  id SERIAL PRIMARY KEY,
+  order_id INTEGER REFERENCES inspection_orders(id),
+  location VARCHAR(120),
+  status VARCHAR(30),
+  moved_by INTEGER REFERENCES users(id),
+  moved_at TIMESTAMP DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS shifts (
+  id SERIAL PRIMARY KEY,
+  inspector_id INTEGER REFERENCES users(id),
+  shift_date DATE NOT NULL,
+  start_time TIME,
+  end_time TIME,
+  pieces_inspected INTEGER DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS invoices (
+  id SERIAL PRIMARY KEY,
+  invoice_number VARCHAR(30) UNIQUE NOT NULL,
+  client_id INTEGER REFERENCES clients(id),
+  order_id INTEGER REFERENCES inspection_orders(id),
+  amount NUMERIC(10,2) NOT NULL,
+  status VARCHAR(20) DEFAULT 'pendiente' CHECK (status IN ('pendiente','pagada','vencida')),
+  issued_at TIMESTAMP DEFAULT now(),
+  due_date DATE,
+  paid_at TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_orders_client ON inspection_orders(client_id);
+CREATE INDEX IF NOT EXISTS idx_orders_status ON inspection_orders(status);
+CREATE INDEX IF NOT EXISTS idx_orders_inspector ON inspection_orders(assigned_inspector_id);
+CREATE INDEX IF NOT EXISTS idx_results_order ON inspection_results(order_id);
+CREATE INDEX IF NOT EXISTS idx_lot_order ON lot_tracking(order_id);
+CREATE INDEX IF NOT EXISTS idx_invoices_client ON invoices(client_id);
+CREATE INDEX IF NOT EXISTS idx_users_client ON users(client_id);
