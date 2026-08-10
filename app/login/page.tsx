@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import "./login.css";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,6 +14,12 @@ export default function LoginPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
+
+    if (!email || !password) {
+      setError("Completa correo y contrasena.");
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await fetch("/api/auth/login", {
@@ -29,85 +36,85 @@ export default function LoginPage() {
       router.push(data.redirectTo);
       router.refresh();
     } catch {
-      setError("Error de conexion. Intenta de nuevo.");
+      setError("No se pudo conectar al servidor.");
       setLoading(false);
     }
   }
 
   return (
-    <main className="flex min-h-screen flex-1 items-center justify-center px-4">
-      <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <h1 className="text-2xl font-semibold text-slate-900">
-            EmBajio Operaciones
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            ERP de inspeccion de piezas industriales
-          </p>
+    <div className="eb-login">
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      {/* eslint-disable-next-line @next/next/no-page-custom-font -- fuente exclusiva del login, no debe cargar en el resto de la app */}
+      <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+      />
+
+      <div className="eb-grid-lines" />
+      <div className="eb-brand-tag">EmBajio Operaciones</div>
+
+      <div className="eb-login-card">
+        <div className="eb-corner tl" />
+        <div className="eb-corner tr" />
+        <div className="eb-corner bl" />
+        <div className="eb-corner br" />
+
+        <div className="eb-status-bar">
+          <span>Sistema activo</span>
+          <div className="eb-status-dot" />
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
-        >
-          <div className="space-y-4">
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-slate-700"
-              >
-                Correo
-              </label>
-              <input
-                id="email"
-                type="email"
-                required
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
-                placeholder="tu@correo.com"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-slate-700"
-              >
-                Contrasena
-              </label>
-              <input
-                id="password"
-                type="password"
-                required
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
-                placeholder="********"
-              />
-            </div>
+        <div className="eb-login-cols">
+          <div className="eb-login-form-col">
+            {error && <div className="eb-error-msg">{error}</div>}
+            <form onSubmit={handleSubmit} noValidate>
+              <div className="eb-form-row">
+                <label htmlFor="email">Correo</label>
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  autoCorrect="off"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  placeholder="tu@correo.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <div className="eb-form-row">
+                <label htmlFor="password">Contrasena</label>
+                <input
+                  id="password"
+                  type="password"
+                  autoComplete="current-password"
+                  placeholder="********"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              <button type="submit" className="eb-btn-login" disabled={loading}>
+                {loading ? "■  Verificando…" : "▶  Entrar"}
+              </button>
+            </form>
           </div>
 
-          {error && (
-            <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
-              {error}
-            </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="mt-6 w-full rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:opacity-50"
-          >
-            {loading ? "Ingresando..." : "Ingresar"}
-          </button>
-        </form>
-
-        <p className="mt-6 text-center text-xs text-slate-400">
-          Acceso para administradores, inspectores y clientes
-        </p>
+          <div className="eb-login-brand-col">
+            <div className="eb-logo-mark">EB</div>
+            <div className="eb-logo-title">
+              EmBajio
+              <span>Operaciones</span>
+            </div>
+            <div className="eb-logo-sub">Inspeccion Industrial</div>
+            <div className="eb-brand-divider" />
+            <div className="eb-powered-by">
+              Powered by
+              <strong>Alta Vibra</strong>
+            </div>
+          </div>
+        </div>
       </div>
-    </main>
+    </div>
   );
 }
