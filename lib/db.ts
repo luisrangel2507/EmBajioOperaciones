@@ -4,10 +4,17 @@ declare global {
   var _pgPool: Pool | undefined;
 }
 
+const connectionString = process.env.DATABASE_URL;
+const needsSsl =
+  !!connectionString &&
+  (connectionString.includes("sslmode=require") ||
+    connectionString.includes("neon.tech"));
+
 export const pool =
   global._pgPool ??
   new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString,
+    ssl: needsSsl ? { rejectUnauthorized: false } : undefined,
   });
 
 if (process.env.NODE_ENV !== "production") {

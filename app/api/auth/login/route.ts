@@ -19,7 +19,17 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const user = await findUserByEmail(email);
+  let user;
+  try {
+    user = await findUserByEmail(email);
+  } catch (err) {
+    console.error("Error de conexion a la base de datos:", err);
+    return NextResponse.json(
+      { error: "No se pudo conectar a la base de datos. Revisa DATABASE_URL." },
+      { status: 500 }
+    );
+  }
+
   if (!user || !user.active) {
     return NextResponse.json(
       { error: "Credenciales invalidas" },
