@@ -1,8 +1,20 @@
+import { redirect } from "next/navigation";
+import { getSession } from "@/lib/auth";
 import { query } from "@/lib/db";
-import OrdersDashboard, { type OrderRow, type OptionRow } from "@/components/OrdersDashboard";
+import { ADMIN_NAV_ITEMS } from "@/lib/adminNav";
+import AppShell from "@/components/AppShell";
+import OrdersDashboard, {
+  type OrderRow,
+  type OptionRow,
+} from "@/components/OrdersDashboard";
 import DashboardHero from "@/components/DashboardHero";
 
 export default async function AdminOrdersPage() {
+  const session = await getSession();
+  if (!session || session.role !== "admin") {
+    redirect("/login");
+  }
+
   const [ordersRes, clientsRes, inspectorsRes] = await Promise.all([
     query<OrderRow>(
       `SELECT
@@ -21,22 +33,31 @@ export default async function AdminOrdersPage() {
           FROM inspection_results
           GROUP BY order_id
        ) r ON r.order_id = o.id
-       ORDER BY o.created_at DESC`
+       ORDER BY o.created_at DESC`,
     ),
-    query<OptionRow>(`SELECT id, company_name AS name FROM clients ORDER BY company_name`),
     query<OptionRow>(
-      `SELECT id, name FROM users WHERE role = 'inspector' AND active ORDER BY name`
+      `SELECT id, company_name AS name FROM clients ORDER BY company_name`,
+    ),
+    query<OptionRow>(
+      `SELECT id, name FROM users WHERE role = 'inspector' AND active ORDER BY name`,
     ),
   ]);
 
   return (
-    <div className="space-y-6">
-      <DashboardHero orders={ordersRes.rows} />
-      <OrdersDashboard
-        initialOrders={ordersRes.rows}
-        clients={clientsRes.rows}
-        inspectors={inspectorsRes.rows}
-      />
-    </div>
+    <AppShell
+      title="Panel de administracion"
+      roleLabel="Administrador"
+      userName={session.name}
+      navItems={ADMIN_NAV_ITEMS}
+    >
+      <div className="space-y-6">
+        <DashboardHero orders={ordersRes.rows} />
+        <OrdersDashboard
+          initialOrders={ordersRes.rows}
+          clients={clientsRes.rows}
+          inspectors={inspectorsRes.rows}
+        />
+      </div>
+    </AppShell>
   );
 }
