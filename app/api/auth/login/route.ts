@@ -6,6 +6,9 @@ import {
   setSessionCookie,
   homeForRole,
 } from "@/lib/auth";
+import { isLoginBlocked, recordFailedLogin } from "@/lib/rateLimit";
+
+const LOGIN_LIMIT = { windowMs: 15 * 60 * 1000, max: 15 };
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
@@ -16,6 +19,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       { error: "Correo y contrasena son requeridos" },
       { status: 400 }
+    );
+  }
+
+  const rateKey = `login:${email.toLowerCase().trim()}`;
+  const { allowed, retryAfterSeconds } = isLoginBlocked(rateKey, LOGIN_LIMIT);
+  if (!allowed) {
+    return NextResponse.json(
+      { error: "Demasiados intentos. Espera unos minutos e intenta de nuevo." },
+      { status: 429, headers: { "Retry-After": String(retryAfterSeconds) } }
     );
   }
 
@@ -31,6 +43,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (!user || !user.active) {
+    recordFailedLogin(rateKey, LOGIN_LIMIT);
     return NextResponse.json(
       { error: "Credenciales invalidas" },
       { status: 401 }
@@ -39,6 +52,7 @@ export async function POST(req: NextRequest) {
 
   const valid = await verifyPassword(password, user.password_hash);
   if (!valid) {
+    recordFailedLogin(rateKey, LOGIN_LIMIT);
     return NextResponse.json(
       { error: "Credenciales invalidas" },
       { status: 401 }
