@@ -1,5 +1,6 @@
 import { query } from "@/lib/db";
 import OrdersDashboard, { type OrderRow, type OptionRow } from "@/components/OrdersDashboard";
+import DashboardHero from "@/components/DashboardHero";
 
 export default async function AdminOrdersPage() {
   const [ordersRes, clientsRes, inspectorsRes] = await Promise.all([
@@ -29,10 +30,13 @@ export default async function AdminOrdersPage() {
   ]);
 
   return (
-    <OrdersDashboard
-      initialOrders={ordersRes.rows}
-      clients={clientsRes.rows}
-      inspectors={inspectorsRes.rows}
-    />
+    <div className="space-y-6">
+      <DashboardHero orders={ordersRes.rows} />
+      <OrdersDashboard
+        initialOrders={ordersRes.rows}
+        clients={clientsRes.rows}
+        inspectors={inspectorsRes.rows}
+      />
+    </div>
   );
 }
