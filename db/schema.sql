@@ -125,6 +125,27 @@ CREATE TABLE IF NOT EXISTS car_reports (
   closed_at TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS quality_records (
+  id SERIAL PRIMARY KEY,
+  category VARCHAR(30) NOT NULL CHECK (category IN (
+    'part_specifications','process_flow_charts','checksheets','sppap',
+    'deviations','fmea','ppap','gage_control','supplier_quality','shared_practices'
+  )),
+  record_number VARCHAR(30) UNIQUE NOT NULL,
+  title VARCHAR(200) NOT NULL,
+  client_id INTEGER REFERENCES clients(id),
+  part_name VARCHAR(160),
+  part_number VARCHAR(80),
+  description TEXT,
+  status VARCHAR(20) DEFAULT 'activo' CHECK (status IN ('activo','en_revision','obsoleto')),
+  severity SMALLINT,
+  occurrence SMALLINT,
+  detection SMALLINT,
+  due_date DATE,
+  created_by INTEGER REFERENCES users(id),
+  created_at TIMESTAMP DEFAULT now()
+);
+
 CREATE TABLE IF NOT EXISTS invoices (
   id SERIAL PRIMARY KEY,
   invoice_number VARCHAR(30) UNIQUE NOT NULL,
@@ -148,3 +169,5 @@ CREATE INDEX IF NOT EXISTS idx_control_plans_client ON control_plans(client_id);
 CREATE INDEX IF NOT EXISTS idx_control_plan_items_plan ON control_plan_items(control_plan_id);
 CREATE INDEX IF NOT EXISTS idx_car_reports_client ON car_reports(client_id);
 CREATE INDEX IF NOT EXISTS idx_car_reports_status ON car_reports(status);
+CREATE INDEX IF NOT EXISTS idx_quality_records_category ON quality_records(category);
+CREATE INDEX IF NOT EXISTS idx_quality_records_client ON quality_records(client_id);
