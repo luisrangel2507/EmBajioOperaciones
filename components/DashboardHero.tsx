@@ -3,7 +3,7 @@ import Image from "next/image";
 export default function DashboardHero() {
   return (
     <div className="relative w-full overflow-hidden rounded-xl border border-kraft-200 shadow-sm">
-      <div className="relative h-72 sm:h-[30rem]">
+      <div className="relative aspect-[2000/857] w-full">
         <Image
           src="/images/dashboard-hero.webp"
           alt=""
