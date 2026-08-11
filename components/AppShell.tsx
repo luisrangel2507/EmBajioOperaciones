@@ -22,48 +22,17 @@ export default function AppShell({
   children: ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen flex-1 bg-kraft-50">
-      <aside className="hidden w-56 shrink-0 border-r border-kraft-200 bg-white sm:flex sm:flex-col">
-        <div className="flex items-center gap-2.5 border-b border-kraft-200 px-5 py-5">
-          <CubeIcon className="h-7 w-7 shrink-0 text-ink-700" />
-          <div>
-            <p className="text-sm leading-tight font-bold text-ink-700">
-              EmBajio<span className="text-olive-600"> Operaciones</span>
-            </p>
-            <p className="text-xs text-ink-500/60">{roleLabel}</p>
-          </div>
-        </div>
-        <nav className="flex-1 space-y-1 px-3 py-4">
-          {navItems.map((item) =>
-            item.href ? (
-              <a
-                key={item.label}
-                href={item.href}
-                className="block rounded-md px-3 py-2 text-sm font-medium text-ink-700/80 transition hover:bg-olive-400/15 hover:text-ink-700"
-              >
-                {item.label}
-              </a>
-            ) : (
-              <span
-                key={item.label}
-                className="flex items-center justify-between rounded-md px-3 py-2 text-sm text-ink-500/40"
-              >
-                {item.label}
-                {item.soon && (
-                  <span className="rounded bg-kraft-100 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-ink-500/50">
-                    Proximamente
-                  </span>
-                )}
-              </span>
-            )
-          )}
-        </nav>
-      </aside>
-
-      <div className="flex flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-kraft-200 bg-white px-4 py-3 sm:px-6">
+    <div className="flex min-h-screen flex-1 flex-col bg-kraft-50">
+      <header className="border-b border-kraft-200 bg-white">
+        <div className="flex items-center justify-between px-4 py-3 sm:px-6">
           <div className="flex items-center gap-3">
-            <h1 className="text-lg font-semibold text-ink-700">{title}</h1>
+            <CubeIcon className="h-7 w-7 shrink-0 text-ink-700" />
+            <div>
+              <p className="text-sm leading-tight font-bold text-ink-700">
+                EmBajio<span className="text-olive-600"> Operaciones</span>
+              </p>
+              <p className="text-xs text-ink-500/60">{roleLabel}</p>
+            </div>
             <span className="hidden items-center gap-1.5 rounded-full bg-olive-400/15 px-2.5 py-1 text-[10px] font-bold tracking-wider text-olive-700 uppercase sm:flex">
               <span className="relative flex h-1.5 w-1.5">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-olive-500 opacity-75" />
@@ -76,9 +45,39 @@ export default function AppShell({
             <span className="text-sm text-ink-500/70">{userName}</span>
             <LogoutButton />
           </div>
-        </header>
-        <main className="flex-1 px-4 py-6 sm:px-6">{children}</main>
-      </div>
+        </div>
+
+        <nav className="flex gap-1 overflow-x-auto border-t border-kraft-100 px-4 sm:px-6">
+          {navItems.map((item) =>
+            item.href ? (
+              <a
+                key={item.label}
+                href={item.href}
+                className="border-b-2 border-transparent px-3 py-2.5 text-xs font-bold tracking-wide whitespace-nowrap text-ink-700/70 uppercase transition hover:border-olive-500 hover:text-ink-700"
+              >
+                {item.label}
+              </a>
+            ) : (
+              <span
+                key={item.label}
+                className="flex items-center gap-1.5 border-b-2 border-transparent px-3 py-2.5 text-xs font-bold tracking-wide whitespace-nowrap text-ink-500/35 uppercase"
+              >
+                {item.label}
+                {item.soon && (
+                  <span className="rounded bg-kraft-100 px-1.5 py-0.5 text-[9px] font-medium tracking-normal text-ink-500/50 normal-case">
+                    Proximamente
+                  </span>
+                )}
+              </span>
+            )
+          )}
+        </nav>
+      </header>
+
+      <main className="flex-1 px-4 py-6 sm:px-6">
+        <h1 className="mb-4 text-lg font-semibold text-ink-700">{title}</h1>
+        {children}
+      </main>
     </div>
   );
 }
