@@ -80,6 +80,51 @@ CREATE TABLE IF NOT EXISTS station_rotations (
   UNIQUE (week_start, day_of_week, time_slot, station_num)
 );
 
+CREATE TABLE IF NOT EXISTS control_plans (
+  id SERIAL PRIMARY KEY,
+  plan_number VARCHAR(30) UNIQUE NOT NULL,
+  part_name VARCHAR(160) NOT NULL,
+  part_number VARCHAR(80),
+  client_id INTEGER REFERENCES clients(id),
+  revision VARCHAR(20) DEFAULT 'A',
+  created_by INTEGER REFERENCES users(id),
+  created_at TIMESTAMP DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS control_plan_items (
+  id SERIAL PRIMARY KEY,
+  control_plan_id INTEGER REFERENCES control_plans(id) ON DELETE CASCADE,
+  process_step VARCHAR(160),
+  characteristic VARCHAR(160) NOT NULL,
+  specification VARCHAR(200),
+  control_method VARCHAR(160),
+  sample_size VARCHAR(60),
+  frequency VARCHAR(80),
+  reaction_plan TEXT,
+  sort_order INTEGER DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS car_reports (
+  id SERIAL PRIMARY KEY,
+  car_number VARCHAR(30) UNIQUE NOT NULL,
+  client_id INTEGER REFERENCES clients(id),
+  part_name VARCHAR(160),
+  part_number VARCHAR(80),
+  problem_summary TEXT NOT NULL,
+  status VARCHAR(20) DEFAULT 'abierto' CHECK (status IN ('abierto','en_proceso','cerrado')),
+  d1_team TEXT,
+  d2_problem_description TEXT,
+  d3_containment_actions TEXT,
+  d4_root_cause TEXT,
+  d5_corrective_actions TEXT,
+  d6_implementation TEXT,
+  d7_prevention TEXT,
+  d8_closure TEXT,
+  opened_by INTEGER REFERENCES users(id),
+  opened_at TIMESTAMP DEFAULT now(),
+  closed_at TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS invoices (
   id SERIAL PRIMARY KEY,
   invoice_number VARCHAR(30) UNIQUE NOT NULL,
@@ -99,3 +144,7 @@ CREATE INDEX IF NOT EXISTS idx_results_order ON inspection_results(order_id);
 CREATE INDEX IF NOT EXISTS idx_lot_order ON lot_tracking(order_id);
 CREATE INDEX IF NOT EXISTS idx_invoices_client ON invoices(client_id);
 CREATE INDEX IF NOT EXISTS idx_users_client ON users(client_id);
+CREATE INDEX IF NOT EXISTS idx_control_plans_client ON control_plans(client_id);
+CREATE INDEX IF NOT EXISTS idx_control_plan_items_plan ON control_plan_items(control_plan_id);
+CREATE INDEX IF NOT EXISTS idx_car_reports_client ON car_reports(client_id);
+CREATE INDEX IF NOT EXISTS idx_car_reports_status ON car_reports(status);
