@@ -31,7 +31,7 @@ export default async function AdminOrdersPage() {
 
   return (
     <div className="space-y-6">
-      <DashboardHero orders={ordersRes.rows} />
+      <DashboardHero />
       <OrdersDashboard
         initialOrders={ordersRes.rows}
         clients={clientsRes.rows}
