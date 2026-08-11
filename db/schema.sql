@@ -69,6 +69,17 @@ CREATE TABLE IF NOT EXISTS shifts (
   pieces_inspected INTEGER DEFAULT 0
 );
 
+CREATE TABLE IF NOT EXISTS station_rotations (
+  id SERIAL PRIMARY KEY,
+  week_start DATE NOT NULL,
+  day_of_week SMALLINT NOT NULL CHECK (day_of_week BETWEEN 0 AND 5),
+  time_slot VARCHAR(5) NOT NULL,
+  station_num SMALLINT NOT NULL,
+  inspector_id INTEGER REFERENCES users(id),
+  updated_at TIMESTAMP DEFAULT now(),
+  UNIQUE (week_start, day_of_week, time_slot, station_num)
+);
+
 CREATE TABLE IF NOT EXISTS invoices (
   id SERIAL PRIMARY KEY,
   invoice_number VARCHAR(30) UNIQUE NOT NULL,
