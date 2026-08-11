@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 export interface OrderRow {
   id: number;
@@ -107,15 +107,6 @@ export default function OrdersDashboard({
     applyFilters(statusFilter, value);
   }
 
-  const summary = useMemo(() => {
-    const total = orders.length;
-    const byStatus = orders.reduce<Record<string, number>>((acc, o) => {
-      acc[o.status] = (acc[o.status] ?? 0) + 1;
-      return acc;
-    }, {});
-    return { total, byStatus };
-  }, [orders]);
-
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
     setFormError(null);
@@ -159,13 +150,6 @@ export default function OrdersDashboard({
 
   return (
     <div className="space-y-6">
-      <StatsCapsule
-        total={summary.total}
-        pendientes={summary.byStatus.pendiente ?? 0}
-        enProceso={summary.byStatus.en_proceso ?? 0}
-        completadas={summary.byStatus.completada ?? 0}
-      />
-
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
           <select
@@ -400,43 +384,6 @@ export default function OrdersDashboard({
       )}
 
       <ToastStack toasts={toasts} />
-    </div>
-  );
-}
-
-function StatsCapsule({
-  total,
-  pendientes,
-  enProceso,
-  completadas,
-}: {
-  total: number;
-  pendientes: number;
-  enProceso: number;
-  completadas: number;
-}) {
-  const stats = [
-    { label: "Total", value: total },
-    { label: "Pendientes", value: pendientes },
-    { label: "En proceso", value: enProceso },
-    { label: "Completadas", value: completadas, accent: true },
-  ];
-  return (
-    <div className="grid grid-cols-2 divide-x divide-y divide-kraft-200 overflow-hidden rounded-xl border border-kraft-200 bg-white shadow-sm sm:grid-cols-4 sm:divide-y-0">
-      {stats.map((s) => (
-        <div key={s.label} className={`px-5 py-4 ${s.accent ? "bg-olive-400/8" : ""}`}>
-          <p className="text-[10px] font-bold tracking-widest text-ink-500/50 uppercase">
-            {s.label}
-          </p>
-          <p
-            className={`mt-1 text-3xl font-black tracking-tight ${
-              s.accent ? "text-olive-700" : "text-ink-700"
-            }`}
-          >
-            {s.value}
-          </p>
-        </div>
-      ))}
     </div>
   );
 }
