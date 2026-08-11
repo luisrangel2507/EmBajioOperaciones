@@ -62,7 +62,16 @@ export default function AppShell({
 
       <div className="flex flex-1 flex-col">
         <header className="flex items-center justify-between border-b border-kraft-200 bg-white px-4 py-3 sm:px-6">
-          <h1 className="text-lg font-semibold text-ink-700">{title}</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-lg font-semibold text-ink-700">{title}</h1>
+            <span className="hidden items-center gap-1.5 rounded-full bg-olive-400/15 px-2.5 py-1 text-[10px] font-bold tracking-wider text-olive-700 uppercase sm:flex">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-olive-500 opacity-75" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-olive-600" />
+              </span>
+              Sistema activo
+            </span>
+          </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-ink-500/70">{userName}</span>
             <LogoutButton />

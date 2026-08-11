@@ -52,6 +52,12 @@ const emptyForm = {
   assigned_inspector_id: "",
 };
 
+interface Toast {
+  id: number;
+  message: string;
+  variant: "success" | "error";
+}
+
 export default function OrdersDashboard({
   initialOrders,
   clients,
@@ -69,6 +75,13 @@ export default function OrdersDashboard({
   const [form, setForm] = useState(emptyForm);
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [toasts, setToasts] = useState<Toast[]>([]);
+
+  function pushToast(message: string, variant: Toast["variant"]) {
+    const id = Date.now();
+    setToasts((t) => [...t, { id, message, variant }]);
+    setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 3500);
+  }
 
   async function applyFilters(nextStatus: string, nextClient: string) {
     setLoading(true);
@@ -135,8 +148,10 @@ export default function OrdersDashboard({
       setForm(emptyForm);
       setShowForm(false);
       await applyFilters(statusFilter, clientFilter);
+      pushToast(`Orden ${data.order.order_number} creada`, "success");
     } catch {
       setFormError("Error de conexion. Intenta de nuevo.");
+      pushToast("No se pudo crear la orden", "error");
     } finally {
       setSubmitting(false);
     }
@@ -144,12 +159,12 @@ export default function OrdersDashboard({
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <SummaryCard label="Total" value={summary.total} />
-        <SummaryCard label="Pendientes" value={summary.byStatus.pendiente ?? 0} />
-        <SummaryCard label="En proceso" value={summary.byStatus.en_proceso ?? 0} />
-        <SummaryCard label="Completadas" value={summary.byStatus.completada ?? 0} accent />
-      </div>
+      <StatsCapsule
+        total={summary.total}
+        pendientes={summary.byStatus.pendiente ?? 0}
+        enProceso={summary.byStatus.en_proceso ?? 0}
+        completadas={summary.byStatus.completada ?? 0}
+      />
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
@@ -189,66 +204,68 @@ export default function OrdersDashboard({
       </div>
 
       <div className="overflow-hidden rounded-xl border border-kraft-200 bg-white shadow-sm">
-        <table className="min-w-full divide-y divide-kraft-200 text-sm">
-          <thead className="bg-kraft-50">
-            <tr>
-              <Th>Orden</Th>
-              <Th>Cliente</Th>
-              <Th>Pieza / Parte</Th>
-              <Th>Lote</Th>
-              <Th>Cantidad</Th>
-              <Th>OK / NG</Th>
-              <Th>Inspector</Th>
-              <Th>Compromiso</Th>
-              <Th>Estatus</Th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-kraft-100">
-            {orders.length === 0 && (
+        <div className="max-h-[520px] overflow-y-auto">
+          <table className="min-w-full divide-y divide-kraft-200 text-sm">
+            <thead className="sticky top-0 z-10 bg-kraft-50">
               <tr>
-                <td colSpan={9} className="px-4 py-8 text-center text-ink-500/40">
-                  No hay ordenes con estos filtros.
-                </td>
+                <Th>Orden</Th>
+                <Th>Cliente</Th>
+                <Th>Pieza / Parte</Th>
+                <Th>Lote</Th>
+                <Th>Cantidad</Th>
+                <Th>OK / NG</Th>
+                <Th>Inspector</Th>
+                <Th>Compromiso</Th>
+                <Th>Estatus</Th>
               </tr>
-            )}
-            {orders.map((o) => (
-              <tr key={o.id} className="hover:bg-kraft-50/70">
-                <td className="px-4 py-3 font-medium text-ink-700">
-                  {o.order_number}
-                </td>
-                <td className="px-4 py-3 text-ink-700/80">
-                  {o.client_name ?? "-"}
-                </td>
-                <td className="px-4 py-3 text-ink-700/80">
-                  <div>{o.part_name}</div>
-                  {o.part_number && (
-                    <div className="text-xs text-ink-500/50">{o.part_number}</div>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-ink-700/80">{o.lot_number ?? "-"}</td>
-                <td className="px-4 py-3 text-ink-700/80">{o.total_pieces}</td>
-                <td className="px-4 py-3 text-ink-700/80">
-                  <span className="text-olive-700">{o.pieces_ok}</span>
-                  {" / "}
-                  <span className="text-red-600">{o.pieces_ng}</span>
-                </td>
-                <td className="px-4 py-3 text-ink-700/80">
-                  {o.inspector_name ?? "Sin asignar"}
-                </td>
-                <td className="px-4 py-3 text-ink-700/80">
-                  {o.due_date ? new Date(o.due_date).toLocaleDateString("es-MX") : "-"}
-                </td>
-                <td className="px-4 py-3">
-                  <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${STATUS_STYLES[o.status]}`}
-                  >
-                    {STATUS_LABELS[o.status]}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-kraft-100">
+              {orders.length === 0 && (
+                <tr>
+                  <td colSpan={9} className="px-4 py-8 text-center text-ink-500/40">
+                    No hay ordenes con estos filtros.
+                  </td>
+                </tr>
+              )}
+              {orders.map((o) => (
+                <tr key={o.id} className="transition hover:bg-olive-400/8">
+                  <td className="px-4 py-3 font-bold text-olive-700">
+                    {o.order_number}
+                  </td>
+                  <td className="px-4 py-3 text-ink-700/80">
+                    {o.client_name ?? "-"}
+                  </td>
+                  <td className="px-4 py-3 text-ink-700/80">
+                    <div>{o.part_name}</div>
+                    {o.part_number && (
+                      <div className="text-xs text-ink-500/50">{o.part_number}</div>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-ink-700/80">{o.lot_number ?? "-"}</td>
+                  <td className="px-4 py-3 text-ink-700/80">{o.total_pieces}</td>
+                  <td className="px-4 py-3 text-ink-700/80">
+                    <span className="text-olive-700">{o.pieces_ok}</span>
+                    {" / "}
+                    <span className="text-red-600">{o.pieces_ng}</span>
+                  </td>
+                  <td className="px-4 py-3 text-ink-700/80">
+                    {o.inspector_name ?? "Sin asignar"}
+                  </td>
+                  <td className="px-4 py-3 text-ink-700/80">
+                    {o.due_date ? new Date(o.due_date).toLocaleDateString("es-MX") : "-"}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${STATUS_STYLES[o.status]}`}
+                    >
+                      {STATUS_LABELS[o.status]}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {showForm && (
@@ -381,29 +398,66 @@ export default function OrdersDashboard({
           </div>
         </div>
       )}
+
+      <ToastStack toasts={toasts} />
     </div>
   );
 }
 
-function SummaryCard({
-  label,
-  value,
-  accent,
+function StatsCapsule({
+  total,
+  pendientes,
+  enProceso,
+  completadas,
 }: {
-  label: string;
-  value: number;
-  accent?: boolean;
+  total: number;
+  pendientes: number;
+  enProceso: number;
+  completadas: number;
 }) {
+  const stats = [
+    { label: "Total", value: total },
+    { label: "Pendientes", value: pendientes },
+    { label: "En proceso", value: enProceso },
+    { label: "Completadas", value: completadas, accent: true },
+  ];
   return (
-    <div
-      className={`rounded-xl border p-4 shadow-sm ${
-        accent
-          ? "border-olive-500/30 bg-olive-400/10"
-          : "border-kraft-200 bg-white"
-      }`}
-    >
-      <p className="text-xs text-ink-500/60">{label}</p>
-      <p className="mt-1 text-2xl font-semibold text-ink-700">{value}</p>
+    <div className="grid grid-cols-2 divide-x divide-y divide-kraft-200 overflow-hidden rounded-xl border border-kraft-200 bg-white shadow-sm sm:grid-cols-4 sm:divide-y-0">
+      {stats.map((s) => (
+        <div key={s.label} className={`px-5 py-4 ${s.accent ? "bg-olive-400/8" : ""}`}>
+          <p className="text-[10px] font-bold tracking-widest text-ink-500/50 uppercase">
+            {s.label}
+          </p>
+          <p
+            className={`mt-1 text-3xl font-black tracking-tight ${
+              s.accent ? "text-olive-700" : "text-ink-700"
+            }`}
+          >
+            {s.value}
+          </p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ToastStack({ toasts }: { toasts: Toast[] }) {
+  if (toasts.length === 0) return null;
+
+  return (
+    <div className="fixed right-4 bottom-4 z-[60] flex flex-col gap-2">
+      {toasts.map((t) => (
+        <div
+          key={t.id}
+          className={`animate-toast-in rounded-lg border px-4 py-3 text-sm font-medium shadow-lg ${
+            t.variant === "success"
+              ? "border-olive-500/30 bg-white text-olive-700"
+              : "border-red-300 bg-white text-red-700"
+          }`}
+        >
+          {t.message}
+        </div>
+      ))}
     </div>
   );
 }

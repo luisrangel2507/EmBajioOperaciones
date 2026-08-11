@@ -50,3 +50,18 @@ body {
   border-color: var(--color-olive-600);
   box-shadow: 0 0 0 1px var(--color-olive-600);
 }
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-toast-in {
+  animation: toast-in 0.2s ease both;
+}
