@@ -47,6 +47,7 @@ export default async function AdminOrdersPage() {
     <AppShell
       title="Panel de administracion"
       roleLabel="Administrador"
+      role="admin"
       userName={session.name}
       navItems={ADMIN_NAV_ITEMS}
     >

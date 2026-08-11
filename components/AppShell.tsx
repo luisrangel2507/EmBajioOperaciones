@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
-import LogoutButton from "@/components/LogoutButton";
+import UserMenu from "@/components/UserMenu";
 import { CubeIcon } from "@/components/icons";
+import type { Role } from "@/lib/session";
 
 interface NavItem {
   label: string;
@@ -12,12 +13,14 @@ export default function AppShell({
   title,
   roleLabel,
   userName,
+  role,
   navItems,
   children,
 }: {
   title: string;
   roleLabel: string;
   userName: string;
+  role: Role;
   navItems: NavItem[];
   children: ReactNode;
 }) {
@@ -43,10 +46,7 @@ export default function AppShell({
               Sistema activo
             </span>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-ink-500/70">{userName}</span>
-            <LogoutButton />
-          </div>
+          <UserMenu userName={userName} roleLabel={roleLabel} role={role} />
         </div>
 
         <nav className="flex gap-1 overflow-x-auto border-t border-kraft-100 px-4 sm:px-6">

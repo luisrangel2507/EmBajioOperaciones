@@ -24,6 +24,7 @@ export default async function ProduccionPage() {
     <AppShell
       title="Produccion"
       roleLabel="Administrador"
+      role="admin"
       userName={session.name}
       navItems={ADMIN_NAV_ITEMS}
     >

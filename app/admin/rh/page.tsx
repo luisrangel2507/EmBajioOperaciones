@@ -111,6 +111,7 @@ export default async function RhPage() {
     <AppShell
       title="RH y Turnos"
       roleLabel="Administrador"
+      role="admin"
       userName={session.name}
       navItems={ADMIN_NAV_ITEMS}
     >

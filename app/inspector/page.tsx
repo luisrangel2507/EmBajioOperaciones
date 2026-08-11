@@ -12,6 +12,7 @@ export default async function InspectorHomePage() {
     <AppShell
       title="Mis ordenes"
       roleLabel="Inspector"
+      role="inspector"
       userName={session.name}
       navItems={[{ label: "Mis ordenes", href: "/inspector" }]}
     >

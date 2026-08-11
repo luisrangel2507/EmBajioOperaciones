@@ -12,6 +12,7 @@ export default async function PortalHomePage() {
     <AppShell
       title="Mis ordenes"
       roleLabel="Portal de cliente"
+      role="cliente"
       userName={session.name}
       navItems={[{ label: "Mis ordenes", href: "/portal" }]}
     >
