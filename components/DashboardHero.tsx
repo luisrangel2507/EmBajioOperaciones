@@ -33,7 +33,7 @@ export default function DashboardHero({ orders }: { orders: OrderRow[] }) {
 
   return (
     <div className="relative w-full overflow-hidden rounded-xl border border-kraft-200 shadow-sm">
-      <div className="relative h-48 sm:h-[26rem]">
+      <div className="relative h-64 sm:h-[34rem]">
         <Image
           src="/images/dashboard-hero.webp"
           alt=""
