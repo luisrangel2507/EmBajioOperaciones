@@ -40,7 +40,7 @@ export default function DashboardHero({ orders }: { orders: OrderRow[] }) {
           aria-hidden="true"
           fill
           priority
-          className="object-cover object-center"
+          className="object-cover object-top"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-ink-700/10 via-ink-700/15 to-ink-700/85" />
 
