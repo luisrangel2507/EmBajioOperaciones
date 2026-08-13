@@ -10,13 +10,28 @@ import OrdersDashboard, {
 import DashboardHero from "@/components/DashboardHero";
 import DashboardGadgets, { type GadgetStats } from "@/components/DashboardGadgets";
 
+function isoDate(d: Date) {
+  return d.toISOString().slice(0, 10);
+}
+
+function daysAgo(n: number) {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() - n);
+  return d;
+}
+
+function dateKey(value: string | Date) {
+  return value instanceof Date ? isoDate(value) : value.slice(0, 10);
+}
+
 export default async function AdminOrdersPage() {
   const session = await getSession();
   if (!session || session.role !== "admin") {
     redirect("/login");
   }
 
-  const [ordersRes, clientsRes, inspectorsRes, gadgetsRes] = await Promise.all([
+  const [ordersRes, clientsRes, inspectorsRes, gadgetsRes, piezasPorDiaRes] = await Promise.all([
     query<OrderRow>(
       `SELECT
           o.id, o.order_number, o.part_name, o.part_number, o.lot_number,
@@ -44,6 +59,8 @@ export default async function AdminOrdersPage() {
     ),
     query<{
       cars_abiertos: string;
+      cars_en_proceso: string;
+      cars_cerrados: string;
       control_plans: string;
       quality_records: string;
       turnos_semana: string;
@@ -51,26 +68,52 @@ export default async function AdminOrdersPage() {
       rotaciones_semana: string;
     }>(
       `SELECT
-        (SELECT COUNT(*) FROM car_reports WHERE status != 'cerrado') AS cars_abiertos,
+        (SELECT COUNT(*) FROM car_reports WHERE status = 'abierto') AS cars_abiertos,
+        (SELECT COUNT(*) FROM car_reports WHERE status = 'en_proceso') AS cars_en_proceso,
+        (SELECT COUNT(*) FROM car_reports WHERE status = 'cerrado') AS cars_cerrados,
         (SELECT COUNT(*) FROM control_plans) AS control_plans,
         (SELECT COUNT(*) FROM quality_records) AS quality_records,
         (SELECT COUNT(*) FROM shifts WHERE shift_date >= date_trunc('week', CURRENT_DATE)::date) AS turnos_semana,
         (SELECT COALESCE(SUM(pieces_inspected), 0) FROM shifts WHERE shift_date >= date_trunc('week', CURRENT_DATE)::date) AS piezas_semana,
         (SELECT COUNT(DISTINCT inspector_id) FROM station_rotations WHERE week_start = date_trunc('week', CURRENT_DATE)::date) AS rotaciones_semana`,
     ),
+    query<{ shift_date: string | Date; total: string }>(
+      `SELECT shift_date, COALESCE(SUM(pieces_inspected), 0) AS total
+       FROM shifts
+       WHERE shift_date >= $1
+       GROUP BY shift_date`,
+      [isoDate(daysAgo(6))],
+    ),
   ]);
 
   const gadgetRow = gadgetsRes.rows[0];
+  const piezasPorDiaMap = new Map(
+    piezasPorDiaRes.rows.map((r) => [dateKey(r.shift_date), Number(r.total)]),
+  );
+  const piezasPorDia = Array.from({ length: 7 }, (_, i) => {
+    const d = daysAgo(6 - i);
+    return {
+      label: d.toLocaleDateString("es-MX", { weekday: "short" }),
+      value: piezasPorDiaMap.get(isoDate(d)) ?? 0,
+    };
+  });
+
   const gadgetStats: GadgetStats = {
     ordenesPendientes: ordersRes.rows.filter((o) => o.status === "pendiente").length,
     ordenesEnProceso: ordersRes.rows.filter((o) => o.status === "en_proceso").length,
     ordenesCompletadas: ordersRes.rows.filter((o) => o.status === "completada").length,
+    ordenesCanceladas: ordersRes.rows.filter((o) => o.status === "cancelada").length,
+    piezasOk: ordersRes.rows.reduce((sum, o) => sum + Number(o.pieces_ok), 0),
+    piezasNg: ordersRes.rows.reduce((sum, o) => sum + Number(o.pieces_ng), 0),
     carsAbiertos: Number(gadgetRow.cars_abiertos),
+    carsEnProceso: Number(gadgetRow.cars_en_proceso),
+    carsCerrados: Number(gadgetRow.cars_cerrados),
     controlPlans: Number(gadgetRow.control_plans),
     qualityRecords: Number(gadgetRow.quality_records),
     turnosSemana: Number(gadgetRow.turnos_semana),
     piezasSemana: Number(gadgetRow.piezas_semana),
     rotacionesSemana: Number(gadgetRow.rotaciones_semana),
+    piezasPorDia,
   };
 
   return (
