@@ -53,7 +53,7 @@ export default function AppShell({
               <a
                 key={item.label}
                 href={item.href}
-                className="border-b-2 border-transparent px-3 py-2.5 text-xs font-bold tracking-wide whitespace-nowrap text-ink-700/70 uppercase transition hover:border-olive-500 hover:text-ink-700"
+                className="border-b-2 border-transparent px-3 py-2.5 text-xs font-bold tracking-wide whitespace-nowrap text-ink-700/70 uppercase transition-all duration-200 ease-out hover:border-olive-500 hover:text-ink-700 active:scale-95"
               >
                 {item.label}
               </a>

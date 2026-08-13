@@ -46,23 +46,38 @@ export default function DashboardHero({ orders }: { orders: OrderRow[] }) {
 
         <a
           href="#gadgets"
-          className="group absolute bottom-28 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2"
+          className="group absolute bottom-36 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2.5"
         >
-          <span className="flex h-12 w-12 animate-bounce items-center justify-center rounded-full border border-white/40 bg-white/10 text-white shadow-[0_10px_24px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.4)] backdrop-blur-md transition group-hover:bg-white/20">
+          <span className="rounded-full bg-ink-700/55 px-3 py-1 text-[10px] font-bold tracking-widest text-white uppercase backdrop-blur-sm transition-colors duration-300 [text-shadow:0_1px_4px_rgba(0,0,0,0.6)] group-hover:bg-ink-700/75">
+            Ir a gadgets
+          </span>
+          <span className="relative flex h-14 w-14 animate-bounce items-center justify-center transition-transform duration-300 ease-out group-hover:scale-110">
+            <svg
+              viewBox="0 0 48 48"
+              fill="none"
+              stroke="white"
+              strokeWidth={1.75}
+              strokeLinejoin="round"
+              className="absolute inset-0 h-full w-full text-white opacity-80 drop-shadow-[0_10px_18px_rgba(0,0,0,0.4)] transition-opacity duration-300 group-hover:opacity-100"
+            >
+              <path d="M24 4 43 15v18L24 44 5 33V15Z" fill="rgba(255,255,255,0.1)" />
+              <path
+                d="M24 4v18M24 22 5 15M24 22l19-7"
+                strokeLinecap="round"
+                opacity={0.55}
+              />
+            </svg>
             <svg
               viewBox="0 0 24 24"
               fill="none"
-              stroke="currentColor"
+              stroke="white"
               strokeWidth={2.5}
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="h-5 w-5"
+              className="relative h-4 w-4 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
             >
               <path d="M6 9l6 6 6-6" />
             </svg>
-          </span>
-          <span className="rounded-full bg-ink-700/50 px-3 py-1 text-[10px] font-bold tracking-widest text-white uppercase backdrop-blur-sm [text-shadow:0_1px_4px_rgba(0,0,0,0.6)]">
-            Ir a gadgets
           </span>
         </a>
       </div>
@@ -116,7 +131,7 @@ function HeroStat({
 }) {
   return (
     <div
-      className={`flex-1 rounded-lg border bg-ink-700/60 px-3.5 py-2.5 backdrop-blur-md ${accent}`}
+      className={`flex-1 rounded-lg border bg-ink-700/60 px-3.5 py-2.5 backdrop-blur-md transition-all duration-300 ease-out hover:-translate-y-0.5 hover:bg-ink-700/75 ${accent}`}
     >
       <p className="text-2xl font-black tracking-tight text-olive-300">{value}</p>
       <p className="text-[9.5px] font-bold tracking-widest text-white/65 uppercase">

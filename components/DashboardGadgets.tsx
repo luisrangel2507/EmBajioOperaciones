@@ -97,10 +97,10 @@ export default function DashboardGadgets({ stats }: { stats: GadgetStats }) {
         </div>
         <button
           onClick={() => setEditing((e) => !e)}
-          className={`shrink-0 rounded-full border px-4 py-1.5 text-xs font-bold tracking-wide uppercase transition ${
+          className={`shrink-0 rounded-full border px-4 py-1.5 text-xs font-bold tracking-wide uppercase transition-all duration-200 ease-out active:scale-95 ${
             editing
               ? "border-olive-500 bg-olive-400/15 text-olive-700"
-              : "border-kraft-300 text-ink-700/70 hover:border-olive-400 hover:text-ink-700"
+              : "border-kraft-300 text-ink-700/70 hover:-translate-y-0.5 hover:border-olive-400 hover:text-ink-700 hover:shadow-sm"
           }`}
         >
           {editing ? "Listo" : "Personalizar"}
@@ -139,7 +139,7 @@ export default function DashboardGadgets({ stats }: { stats: GadgetStats }) {
                 <button
                   key={g.id}
                   onClick={() => toggleGadget(g.id)}
-                  className="rounded-full border border-kraft-300 bg-white px-3 py-1.5 text-xs font-semibold text-ink-700/80 transition hover:border-olive-400 hover:text-ink-700"
+                  className="rounded-full border border-kraft-300 bg-white px-3 py-1.5 text-xs font-semibold text-ink-700/80 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-olive-400 hover:text-ink-700 hover:shadow-sm active:scale-95"
                 >
                   + {g.title} <span className="text-ink-500/40">· {g.module}</span>
                 </button>
@@ -167,7 +167,7 @@ function GadgetCard({
 }) {
   return (
     <div
-      className={`relative rounded-xl border border-kraft-200 bg-white p-4 shadow-sm ${
+      className={`relative rounded-xl border border-kraft-200 bg-white p-4 shadow-sm transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md ${
         def.kind === "bubble" ? "" : "col-span-2"
       }`}
     >
@@ -175,7 +175,7 @@ function GadgetCard({
         <button
           onClick={onRemove}
           aria-label={`Quitar ${def.title}`}
-          className="absolute top-2 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-kraft-100 text-xs text-ink-500/60 transition hover:bg-red-100 hover:text-red-600"
+          className="absolute top-2 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-kraft-100 text-xs text-ink-500/60 transition-all duration-200 ease-out hover:scale-110 hover:bg-red-100 hover:text-red-600 active:scale-90"
         >
           ×
         </button>
@@ -266,7 +266,7 @@ function GadgetContent({ def, stats }: { def: GadgetDef; stats: GadgetStats }) {
 
 function Bubble({ value, label }: { value: number; label: string }) {
   return (
-    <div className="flex flex-col items-center gap-0.5 rounded-full bg-kraft-50 px-3 py-4 text-center ring-1 ring-kraft-200">
+    <div className="flex flex-col items-center gap-0.5 rounded-full bg-kraft-50 px-3 py-4 text-center ring-1 ring-kraft-200 transition-all duration-200 ease-out hover:scale-[1.03] hover:ring-olive-400/50">
       <p className="text-xl font-black tracking-tight text-ink-700">{value}</p>
       <p className="text-[9px] leading-tight font-semibold text-ink-500/60 uppercase">{label}</p>
     </div>

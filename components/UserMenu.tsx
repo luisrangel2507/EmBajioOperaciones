@@ -49,7 +49,7 @@ export default function UserMenu({
       </div>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-olive-400/20 text-sm font-bold text-olive-700 ring-1 ring-olive-500/30 transition hover:bg-olive-400/30"
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-olive-400/20 text-sm font-bold text-olive-700 ring-1 ring-olive-500/30 transition-all duration-200 ease-out hover:scale-105 hover:bg-olive-400/30 active:scale-95"
         aria-label="Menu de perfil"
         aria-expanded={open}
       >
@@ -57,7 +57,7 @@ export default function UserMenu({
       </button>
 
       {open && (
-        <div className="absolute top-11 right-0 z-50 w-56 overflow-hidden rounded-lg border border-kraft-200 bg-white shadow-lg">
+        <div className="animate-menu-in absolute top-11 right-0 z-50 w-56 origin-top-right overflow-hidden rounded-lg border border-kraft-200 bg-white shadow-lg">
           <div className="border-b border-kraft-100 px-4 py-3">
             <p className="text-sm font-semibold text-ink-700">{userName}</p>
             <p className="text-xs text-ink-500/60">{roleLabel}</p>
