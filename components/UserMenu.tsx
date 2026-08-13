@@ -42,10 +42,14 @@ export default function UserMenu({
   }
 
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative flex items-center gap-2.5" ref={ref}>
+      <div className="hidden text-right sm:block">
+        <p className="text-xs leading-tight font-semibold text-ink-700">{userName}</p>
+        <p className="text-[10px] leading-tight text-ink-500/60">{roleLabel}</p>
+      </div>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex h-9 w-9 items-center justify-center rounded-full bg-olive-400/20 text-sm font-bold text-olive-700 ring-1 ring-olive-500/30 transition hover:bg-olive-400/30"
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-olive-400/20 text-sm font-bold text-olive-700 ring-1 ring-olive-500/30 transition hover:bg-olive-400/30"
         aria-label="Menu de perfil"
         aria-expanded={open}
       >
