@@ -53,6 +53,10 @@ const DEFAULT_IDS = [
   "rh-turnos",
   "rh-piezas",
   "prod-rotacion",
+  "ord-chart-estatus",
+  "ord-chart-okng",
+  "cal-chart-cars",
+  "rh-chart-sparkline",
 ];
 
 const STORAGE_KEY = "embajio:dashboard-gadgets:v1";
