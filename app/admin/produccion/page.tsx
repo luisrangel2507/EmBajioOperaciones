@@ -4,10 +4,37 @@ import { query } from "@/lib/db";
 import { ADMIN_NAV_ITEMS } from "@/lib/adminNav";
 import AppShell from "@/components/AppShell";
 import RotationGrid from "@/components/RotationGrid";
+import OeeDashboard, { type OeeDayRow } from "@/components/OeeDashboard";
 
 interface OptionRow {
   id: number;
   name: string;
+}
+
+const OEE_DAYS = 14;
+
+function isoDate(d: Date) {
+  return d.toISOString().slice(0, 10);
+}
+
+function daysAgo(n: number) {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() - n);
+  return d;
+}
+
+function dateKey(value: string | Date) {
+  return value instanceof Date ? isoDate(value) : value.slice(0, 10);
+}
+
+function minutesBetween(start: string | null, end: string | null) {
+  if (!start || !end) return 0;
+  const [sh, sm] = start.split(":").map(Number);
+  const [eh, em] = end.split(":").map(Number);
+  let minutes = eh * 60 + em - (sh * 60 + sm);
+  if (minutes < 0) minutes += 24 * 60;
+  return minutes;
 }
 
 export default async function ProduccionPage() {
@@ -16,9 +43,78 @@ export default async function ProduccionPage() {
     redirect("/login");
   }
 
-  const inspectorsRes = await query<OptionRow>(
-    `SELECT id, name FROM users WHERE role = 'inspector' AND active ORDER BY name`
+  const rangeStart = daysAgo(OEE_DAYS - 1);
+
+  const [inspectorsRes, plansRes, shiftsRes, resultsRes] = await Promise.all([
+    query<OptionRow>(
+      `SELECT id, name FROM users WHERE role = 'inspector' AND active ORDER BY name`
+    ),
+    query<{ plan_date: string | Date; planned_pieces: number; planned_minutes: number }>(
+      `SELECT plan_date, planned_pieces, planned_minutes
+       FROM production_plans
+       WHERE plan_date >= $1
+       ORDER BY plan_date`,
+      [isoDate(rangeStart)]
+    ),
+    query<{
+      shift_date: string | Date;
+      start_time: string | null;
+      end_time: string | null;
+      pieces_inspected: number;
+    }>(
+      `SELECT shift_date, start_time, end_time, pieces_inspected
+       FROM shifts
+       WHERE shift_date >= $1`,
+      [isoDate(rangeStart)]
+    ),
+    query<{ day: string | Date; ok: string; ng: string }>(
+      `SELECT DATE(inspected_at) AS day,
+              COALESCE(SUM(pieces_ok), 0) AS ok,
+              COALESCE(SUM(pieces_ng), 0) AS ng
+       FROM inspection_results
+       WHERE inspected_at >= $1
+       GROUP BY DATE(inspected_at)`,
+      [isoDate(rangeStart)]
+    ),
+  ]);
+
+  const plansMap = new Map(
+    plansRes.rows.map((p) => [
+      dateKey(p.plan_date),
+      { pieces: p.planned_pieces, minutes: p.planned_minutes },
+    ])
   );
+
+  const actualByDay = new Map<string, { pieces: number; minutes: number }>();
+  for (const s of shiftsRes.rows) {
+    const key = dateKey(s.shift_date);
+    const prev = actualByDay.get(key) ?? { pieces: 0, minutes: 0 };
+    prev.pieces += s.pieces_inspected;
+    prev.minutes += minutesBetween(s.start_time, s.end_time);
+    actualByDay.set(key, prev);
+  }
+
+  const qualityByDay = new Map(
+    resultsRes.rows.map((r) => [dateKey(r.day), { ok: Number(r.ok), ng: Number(r.ng) }])
+  );
+
+  const days: OeeDayRow[] = Array.from({ length: OEE_DAYS }, (_, i) => {
+    const d = daysAgo(OEE_DAYS - 1 - i);
+    const key = isoDate(d);
+    const plan = plansMap.get(key);
+    const actual = actualByDay.get(key);
+    const quality = qualityByDay.get(key);
+    return {
+      date: key,
+      label: d.toLocaleDateString("es-MX", { weekday: "short", day: "numeric", month: "short" }),
+      plannedPieces: plan?.pieces ?? 0,
+      plannedMinutes: plan?.minutes ?? 0,
+      actualPieces: actual?.pieces ?? 0,
+      actualMinutes: actual?.minutes ?? 0,
+      piecesOk: quality?.ok ?? 0,
+      piecesNg: quality?.ng ?? 0,
+    };
+  });
 
   return (
     <AppShell
@@ -28,7 +124,9 @@ export default async function ProduccionPage() {
       userName={session.name}
       navItems={ADMIN_NAV_ITEMS}
     >
-      <div className="space-y-6">
+      <div className="space-y-8">
+        <OeeDashboard initialDays={days} />
+
         <div>
           <h2 className="mb-1 text-sm font-bold tracking-wide text-ink-700 uppercase">
             🔄 Rotacion de estaciones

@@ -146,6 +146,15 @@ CREATE TABLE IF NOT EXISTS quality_records (
   created_at TIMESTAMP DEFAULT now()
 );
 
+CREATE TABLE IF NOT EXISTS production_plans (
+  id SERIAL PRIMARY KEY,
+  plan_date DATE UNIQUE NOT NULL,
+  planned_pieces INTEGER NOT NULL DEFAULT 0,
+  planned_minutes INTEGER NOT NULL DEFAULT 480,
+  created_by INTEGER REFERENCES users(id),
+  updated_at TIMESTAMP DEFAULT now()
+);
+
 CREATE TABLE IF NOT EXISTS invoices (
   id SERIAL PRIMARY KEY,
   invoice_number VARCHAR(30) UNIQUE NOT NULL,
@@ -171,3 +180,4 @@ CREATE INDEX IF NOT EXISTS idx_car_reports_client ON car_reports(client_id);
 CREATE INDEX IF NOT EXISTS idx_car_reports_status ON car_reports(status);
 CREATE INDEX IF NOT EXISTS idx_quality_records_category ON quality_records(category);
 CREATE INDEX IF NOT EXISTS idx_quality_records_client ON quality_records(client_id);
+CREATE INDEX IF NOT EXISTS idx_production_plans_date ON production_plans(plan_date);
