@@ -34,9 +34,7 @@ export default function AppShell({
               <p className="text-sm leading-tight font-bold text-ink-700">
                 EmBajio<span className="text-olive-600"> Operaciones</span>
               </p>
-              <p className="text-xs text-ink-500/60">
-                {roleLabel} <span className="text-ink-500/35">· Powered by Alta Vibra</span>
-              </p>
+              <p className="text-xs text-ink-500/60">Powered by Alta Vibra</p>
             </div>
             <span className="hidden items-center gap-1.5 rounded-full bg-olive-400/15 px-2.5 py-1 text-[10px] font-bold tracking-wider text-olive-700 uppercase sm:flex">
               <span className="relative flex h-1.5 w-1.5">
