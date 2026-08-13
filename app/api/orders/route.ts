@@ -22,9 +22,15 @@ export async function GET(req: NextRequest) {
     conditions.push(`o.assigned_inspector_id = $${params.length}`);
   }
 
-  if (status && VALID_STATUSES.includes(status)) {
-    params.push(status);
-    conditions.push(`o.status = $${params.length}`);
+  if (status) {
+    const statuses = status.split(",").filter((s) => VALID_STATUSES.includes(s));
+    if (statuses.length === 1) {
+      params.push(statuses[0]);
+      conditions.push(`o.status = $${params.length}`);
+    } else if (statuses.length > 1) {
+      params.push(statuses);
+      conditions.push(`o.status = ANY($${params.length})`);
+    }
   }
 
   if (clientId) {

@@ -62,13 +62,15 @@ export default function OrdersDashboard({
   initialOrders,
   clients,
   inspectors,
+  defaultStatus,
 }: {
   initialOrders: OrderRow[];
   clients: OptionRow[];
   inspectors: OptionRow[];
+  defaultStatus?: string;
 }) {
   const [orders, setOrders] = useState(initialOrders);
-  const [statusFilter, setStatusFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState(defaultStatus ?? "");
   const [clientFilter, setClientFilter] = useState("");
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -157,7 +159,9 @@ export default function OrdersDashboard({
             onChange={(e) => onStatusChange(e.target.value)}
             className="rounded-lg border border-kraft-300 bg-white px-3 py-2 text-sm text-ink-700 shadow-sm focus:border-olive-600 focus:outline-none"
           >
-            <option value="">Todos los estatus</option>
+            <option value={defaultStatus ?? ""}>
+              {defaultStatus ? "Pendiente + en proceso" : "Todos los estatus"}
+            </option>
             {Object.entries(STATUS_LABELS).map(([value, label]) => (
               <option key={value} value={value}>
                 {label}
