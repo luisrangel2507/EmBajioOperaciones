@@ -43,7 +43,7 @@ export default function AppShell({
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-olive-500 opacity-75" />
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-olive-600" />
               </span>
-              Sistema activo
+              Proteccion activa
             </span>
           </div>
           <UserMenu userName={userName} roleLabel={roleLabel} role={role} />

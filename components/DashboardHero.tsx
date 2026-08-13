@@ -43,12 +43,6 @@ export default function DashboardHero({ orders }: { orders: OrderRow[] }) {
           className="object-cover object-top"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-ink-700/10 via-ink-700/15 to-ink-700/85" />
-
-        <div className="absolute top-4 left-5">
-          <span className="text-[10px] font-bold tracking-[0.3em] text-white/90 uppercase [text-shadow:0_1px_6px_rgba(0,0,0,0.8)]">
-            ◈ Panel de administracion
-          </span>
-        </div>
       </div>
 
       <div className="flex flex-col gap-2 bg-ink-700 p-4 sm:absolute sm:inset-x-5 sm:bottom-3.5 sm:flex-row sm:gap-3 sm:bg-transparent sm:p-0">
