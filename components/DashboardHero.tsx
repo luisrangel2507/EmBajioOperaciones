@@ -43,6 +43,28 @@ export default function DashboardHero({ orders }: { orders: OrderRow[] }) {
           className="object-cover object-top"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-ink-700/10 via-ink-700/15 to-ink-700/85" />
+
+        <a
+          href="#gadgets"
+          className="group absolute bottom-28 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2"
+        >
+          <span className="flex h-12 w-12 animate-bounce items-center justify-center rounded-full border border-white/40 bg-white/10 text-white shadow-[0_10px_24px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.4)] backdrop-blur-md transition group-hover:bg-white/20">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2.5}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-5 w-5"
+            >
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </span>
+          <span className="rounded-full bg-ink-700/50 px-3 py-1 text-[10px] font-bold tracking-widest text-white uppercase backdrop-blur-sm [text-shadow:0_1px_4px_rgba(0,0,0,0.6)]">
+            Ir a gadgets
+          </span>
+        </a>
       </div>
 
       <div className="flex flex-col gap-2 bg-ink-700 p-4 sm:absolute sm:inset-x-5 sm:bottom-3.5 sm:flex-row sm:gap-3 sm:bg-transparent sm:p-0">
