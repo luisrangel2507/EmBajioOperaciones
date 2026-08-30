@@ -6,6 +6,9 @@ import AppShell from "@/components/AppShell";
 import RotationGrid from "@/components/RotationGrid";
 import OeeDashboard, { type OeeDayRow } from "@/components/OeeDashboard";
 import OrdersDashboard, { type OrderRow } from "@/components/OrdersDashboard";
+import ScrapPanel, { type ScrapRow } from "@/components/ScrapPanel";
+
+const SCRAP_DAYS = 30;
 
 interface OptionRow {
   id: number;
@@ -46,7 +49,7 @@ export default async function ProduccionPage() {
 
   const rangeStart = daysAgo(OEE_DAYS - 1);
 
-  const [inspectorsRes, clientsRes, ordersRes, plansRes, shiftsRes, resultsRes] =
+  const [inspectorsRes, clientsRes, ordersRes, plansRes, shiftsRes, resultsRes, scrapRes] =
     await Promise.all([
     query<OptionRow>(
       `SELECT id, name FROM users WHERE role = 'inspector' AND active ORDER BY name`
@@ -100,6 +103,16 @@ export default async function ProduccionPage() {
        WHERE inspected_at >= $1
        GROUP BY DATE(inspected_at)`,
       [isoDate(rangeStart)]
+    ),
+    query<ScrapRow>(
+      `SELECT s.id, s.scrap_date, s.part_name, s.part_number, s.station_num,
+              s.operation, s.quantity, s.reason, s.notes, s.created_at,
+              c.id AS client_id, c.company_name AS client_name
+       FROM scrap_records s
+       LEFT JOIN clients c ON c.id = s.client_id
+       WHERE s.scrap_date >= $1
+       ORDER BY s.scrap_date DESC, s.created_at DESC`,
+      [isoDate(daysAgo(SCRAP_DAYS - 1))]
     ),
   ]);
 
@@ -167,6 +180,16 @@ export default async function ProduccionPage() {
           inspectors={inspectorsRes.rows}
           defaultStatus="pendiente,en_proceso"
         />
+
+        <div>
+          <h2 className="mb-1 text-sm font-bold tracking-wide text-ink-700 uppercase">
+            🗑️ Desechos / Scrap
+          </h2>
+          <p className="text-xs text-ink-500/60">
+            Registra piezas desechadas por estacion y motivo. Ultimos {SCRAP_DAYS} dias.
+          </p>
+        </div>
+        <ScrapPanel initialRecords={scrapRes.rows} clients={clientsRes.rows} />
 
         <div>
           <h2 className="mb-1 text-sm font-bold tracking-wide text-ink-700 uppercase">

@@ -146,6 +146,22 @@ CREATE TABLE IF NOT EXISTS quality_records (
   created_at TIMESTAMP DEFAULT now()
 );
 
+CREATE TABLE IF NOT EXISTS scrap_records (
+  id SERIAL PRIMARY KEY,
+  scrap_date DATE NOT NULL DEFAULT CURRENT_DATE,
+  part_name VARCHAR(160) NOT NULL,
+  part_number VARCHAR(80),
+  station_num SMALLINT,
+  operation VARCHAR(120),
+  quantity INTEGER NOT NULL,
+  reason VARCHAR(60) NOT NULL,
+  notes TEXT,
+  order_id INTEGER REFERENCES inspection_orders(id),
+  client_id INTEGER REFERENCES clients(id),
+  created_by INTEGER REFERENCES users(id),
+  created_at TIMESTAMP DEFAULT now()
+);
+
 CREATE TABLE IF NOT EXISTS production_plans (
   id SERIAL PRIMARY KEY,
   plan_date DATE UNIQUE NOT NULL,
@@ -181,3 +197,5 @@ CREATE INDEX IF NOT EXISTS idx_car_reports_status ON car_reports(status);
 CREATE INDEX IF NOT EXISTS idx_quality_records_category ON quality_records(category);
 CREATE INDEX IF NOT EXISTS idx_quality_records_client ON quality_records(client_id);
 CREATE INDEX IF NOT EXISTS idx_production_plans_date ON production_plans(plan_date);
+CREATE INDEX IF NOT EXISTS idx_scrap_records_date ON scrap_records(scrap_date);
+CREATE INDEX IF NOT EXISTS idx_scrap_records_order ON scrap_records(order_id);
