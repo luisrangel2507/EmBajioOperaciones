@@ -15,12 +15,23 @@ export interface ScrapRow {
   notes: string | null;
   client_id: number | null;
   client_name: string | null;
+  order_id: number | null;
+  order_number: string | null;
+  order_total_pieces: number | null;
   created_at: string;
 }
 
 interface ClientOption {
   id: number;
   name: string;
+}
+
+export interface OrderOption {
+  id: number;
+  order_number: string;
+  part_name: string;
+  part_number: string | null;
+  total_pieces: number;
 }
 
 const emptyForm = {
@@ -32,15 +43,18 @@ const emptyForm = {
   quantity: "",
   reason: "",
   client_id: "",
+  order_id: "",
   notes: "",
 };
 
 export default function ScrapPanel({
   initialRecords,
   clients,
+  orders,
 }: {
   initialRecords: ScrapRow[];
   clients: ClientOption[];
+  orders: OrderOption[];
 }) {
   const [records, setRecords] = useState(initialRecords);
   const [showForm, setShowForm] = useState(false);
@@ -55,17 +69,26 @@ export default function ScrapPanel({
   }
   const topReason = [...reasonTotals.entries()].sort((a, b) => b[1] - a[1])[0];
 
-  // Pivote: piezas en filas, motivos usados en columnas (igual que el reporte de Plex)
+  // Pivote: piezas (u ordenes, cuando estan ligadas) en filas, motivos en columnas
   const usedReasons = SCRAP_REASONS.filter((r) => reasonTotals.has(r));
   const byPart = new Map<
     string,
-    { partName: string; partNumber: string | null; byReason: Map<string, number>; total: number }
+    {
+      partName: string;
+      partNumber: string | null;
+      orderNumber: string | null;
+      orderTotalPieces: number | null;
+      byReason: Map<string, number>;
+      total: number;
+    }
   >();
   for (const r of records) {
-    const key = `${r.part_name}|${r.part_number ?? ""}`;
+    const key = r.order_id ? `order-${r.order_id}` : `part-${r.part_name}|${r.part_number ?? ""}`;
     const entry = byPart.get(key) ?? {
       partName: r.part_name,
       partNumber: r.part_number,
+      orderNumber: r.order_number,
+      orderTotalPieces: r.order_total_pieces,
       byReason: new Map<string, number>(),
       total: 0,
     };
@@ -101,6 +124,7 @@ export default function ScrapPanel({
           quantity: Number(form.quantity),
           station_num: form.station_num || null,
           client_id: form.client_id || null,
+          order_id: form.order_id || null,
         }),
       });
       const data = await res.json();
@@ -110,6 +134,7 @@ export default function ScrapPanel({
         return;
       }
       const client = clients.find((c) => c.id === Number(form.client_id));
+      const order = orders.find((o) => o.id === Number(form.order_id));
       setRecords((prev) => [
         {
           id: data.record.id,
@@ -123,6 +148,9 @@ export default function ScrapPanel({
           notes: form.notes || null,
           client_id: form.client_id ? Number(form.client_id) : null,
           client_name: client?.name ?? null,
+          order_id: order?.id ?? null,
+          order_number: order?.order_number ?? null,
+          order_total_pieces: order?.total_pieces ?? null,
           created_at: new Date().toISOString(),
         },
         ...prev,
@@ -177,6 +205,12 @@ export default function ScrapPanel({
                 <th rowSpan={2} className="px-4 py-2.5 text-left text-xs font-semibold tracking-wide text-ink-500/60 uppercase align-bottom">
                   Total piezas
                 </th>
+                <th rowSpan={2} className="px-4 py-2.5 text-left text-xs font-semibold tracking-wide text-ink-500/60 uppercase align-bottom">
+                  % Desechos
+                </th>
+                <th rowSpan={2} className="px-4 py-2.5 text-left text-xs font-semibold tracking-wide text-ink-500/60 uppercase align-bottom">
+                  PPM
+                </th>
               </tr>
               <tr>
                 {usedReasons.map((r) => (
@@ -185,22 +219,44 @@ export default function ScrapPanel({
               </tr>
             </thead>
             <tbody className="divide-y divide-kraft-100">
-              {partRows.map((p) => (
-                <tr key={`${p.partName}|${p.partNumber ?? ""}`} className="hover:bg-olive-400/8">
-                  <td className="px-4 py-3 text-ink-700/80">
-                    <div className="font-medium text-ink-700">{p.partName}</div>
-                    {p.partNumber && (
-                      <div className="text-xs text-ink-500/50">{p.partNumber}</div>
-                    )}
-                  </td>
-                  {usedReasons.map((r) => (
-                    <td key={r} className="px-4 py-3 text-ink-700/80">
-                      {p.byReason.get(r) ?? 0}
+              {partRows.map((p) => {
+                const pct =
+                  p.orderTotalPieces && p.orderTotalPieces > 0
+                    ? (p.total / p.orderTotalPieces) * 100
+                    : null;
+                const ppm =
+                  p.orderTotalPieces && p.orderTotalPieces > 0
+                    ? (p.total / p.orderTotalPieces) * 1_000_000
+                    : null;
+                return (
+                  <tr
+                    key={`${p.orderNumber ?? "sin-orden"}|${p.partName}|${p.partNumber ?? ""}`}
+                    className="hover:bg-olive-400/8"
+                  >
+                    <td className="px-4 py-3 text-ink-700/80">
+                      <div className="font-medium text-ink-700">{p.partName}</div>
+                      {p.partNumber && (
+                        <div className="text-xs text-ink-500/50">{p.partNumber}</div>
+                      )}
+                      {p.orderNumber && (
+                        <div className="text-xs text-olive-700">{p.orderNumber}</div>
+                      )}
                     </td>
-                  ))}
-                  <td className="px-4 py-3 font-bold text-red-600">{p.total}</td>
-                </tr>
-              ))}
+                    {usedReasons.map((r) => (
+                      <td key={r} className="px-4 py-3 text-ink-700/80">
+                        {p.byReason.get(r) ?? 0}
+                      </td>
+                    ))}
+                    <td className="px-4 py-3 font-bold text-red-600">{p.total}</td>
+                    <td className="px-4 py-3 text-ink-700/80">
+                      {pct !== null ? `${pct.toFixed(2)}%` : "-"}
+                    </td>
+                    <td className="px-4 py-3 text-ink-700/80">
+                      {ppm !== null ? Math.round(ppm).toLocaleString("es-MX") : "-"}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
             <tfoot className="border-t-2 border-kraft-200 bg-kraft-50 font-bold">
               <tr>
@@ -211,6 +267,8 @@ export default function ScrapPanel({
                   </td>
                 ))}
                 <td className="px-4 py-3 text-red-600">{totalQty}</td>
+                <td className="px-4 py-3 text-ink-500/40">-</td>
+                <td className="px-4 py-3 text-ink-500/40">-</td>
               </tr>
             </tfoot>
           </table>
@@ -226,6 +284,7 @@ export default function ScrapPanel({
             <tr>
               <Th>Fecha</Th>
               <Th>Pieza</Th>
+              <Th>Orden</Th>
               <Th>Estacion</Th>
               <Th>Operacion</Th>
               <Th>Cantidad</Th>
@@ -236,7 +295,7 @@ export default function ScrapPanel({
           <tbody className="divide-y divide-kraft-100">
             {records.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-ink-500/40">
+                <td colSpan={8} className="px-4 py-8 text-center text-ink-500/40">
                   No hay desechos registrados.
                 </td>
               </tr>
@@ -252,6 +311,7 @@ export default function ScrapPanel({
                     <div className="text-xs text-ink-500/50">{r.part_number}</div>
                   )}
                 </td>
+                <td className="px-4 py-3 text-ink-700/80">{r.order_number ?? "-"}</td>
                 <td className="px-4 py-3 text-ink-700/80">
                   {r.station_num ? `Est. ${r.station_num}` : "-"}
                 </td>
@@ -298,6 +358,30 @@ export default function ScrapPanel({
                     className="input"
                     required
                   />
+                </Field>
+
+                <Field label="Orden (para % y PPM)" className="col-span-2">
+                  <select
+                    value={form.order_id}
+                    onChange={(e) => {
+                      const orderId = e.target.value;
+                      const order = orders.find((o) => o.id === Number(orderId));
+                      setForm({
+                        ...form,
+                        order_id: orderId,
+                        part_name: order ? order.part_name : form.part_name,
+                        part_number: order ? (order.part_number ?? "") : form.part_number,
+                      });
+                    }}
+                    className="input"
+                  >
+                    <option value="">Sin orden (no calcula % ni PPM)</option>
+                    {orders.map((o) => (
+                      <option key={o.id} value={o.id}>
+                        {o.order_number} · {o.part_name} ({o.total_pieces} pz)
+                      </option>
+                    ))}
+                  </select>
                 </Field>
 
                 <Field label="Pieza" required className="col-span-2">

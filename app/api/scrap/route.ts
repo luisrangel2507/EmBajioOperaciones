@@ -23,9 +23,11 @@ export async function GET(req: NextRequest) {
   const result = await query(
     `SELECT s.id, s.scrap_date, s.part_name, s.part_number, s.station_num,
             s.operation, s.quantity, s.reason, s.notes, s.created_at,
-            c.id AS client_id, c.company_name AS client_name
+            c.id AS client_id, c.company_name AS client_name,
+            o.id AS order_id, o.order_number, o.total_pieces AS order_total_pieces
      FROM scrap_records s
      LEFT JOIN clients c ON c.id = s.client_id
+     LEFT JOIN inspection_orders o ON o.id = s.order_id
      ${where}
      ORDER BY s.scrap_date DESC, s.created_at DESC`,
     params
@@ -51,6 +53,7 @@ export async function POST(req: NextRequest) {
     reason,
     notes,
     client_id,
+    order_id,
   } = body ?? {};
 
   if (!part_name) {
@@ -66,8 +69,8 @@ export async function POST(req: NextRequest) {
 
   const result = await query(
     `INSERT INTO scrap_records
-      (scrap_date, part_name, part_number, station_num, operation, quantity, reason, notes, client_id, created_by)
-     VALUES (COALESCE($1, CURRENT_DATE), $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      (scrap_date, part_name, part_number, station_num, operation, quantity, reason, notes, client_id, order_id, created_by)
+     VALUES (COALESCE($1, CURRENT_DATE), $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
      RETURNING id`,
     [
       scrap_date || null,
@@ -79,6 +82,7 @@ export async function POST(req: NextRequest) {
       reason,
       notes || null,
       client_id || null,
+      order_id || null,
       session.userId,
     ]
   );
