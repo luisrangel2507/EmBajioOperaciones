@@ -165,11 +165,23 @@ export default function ScrapPanel({
           <table className="min-w-full divide-y divide-kraft-200 text-sm">
             <thead className="bg-kraft-50">
               <tr>
-                <Th>Pieza</Th>
+                <th rowSpan={2} className="px-4 py-2.5 text-left text-xs font-semibold tracking-wide text-ink-500/60 uppercase align-bottom">
+                  Pieza
+                </th>
+                <th
+                  colSpan={usedReasons.length}
+                  className="border-b border-kraft-200 px-4 py-1.5 text-center text-[10px] font-bold tracking-widest text-ink-500/50 uppercase"
+                >
+                  Motivo del desecho
+                </th>
+                <th rowSpan={2} className="px-4 py-2.5 text-left text-xs font-semibold tracking-wide text-ink-500/60 uppercase align-bottom">
+                  Total piezas
+                </th>
+              </tr>
+              <tr>
                 {usedReasons.map((r) => (
                   <Th key={r}>{r}</Th>
                 ))}
-                <Th>Total piezas</Th>
               </tr>
             </thead>
             <tbody className="divide-y divide-kraft-100">
