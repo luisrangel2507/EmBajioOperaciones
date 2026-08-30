@@ -7,6 +7,7 @@ import RotationGrid from "@/components/RotationGrid";
 import OeeDashboard, { type OeeDayRow } from "@/components/OeeDashboard";
 import OrdersDashboard, { type OrderRow } from "@/components/OrdersDashboard";
 import ScrapPanel, { type ScrapRow, type OrderOption } from "@/components/ScrapPanel";
+import ScrapTrendChart, { type ScrapTrendPoint } from "@/components/ScrapTrendChart";
 
 const SCRAP_DAYS = 30;
 
@@ -47,7 +48,7 @@ export default async function ProduccionPage() {
     redirect("/login");
   }
 
-  const rangeStart = daysAgo(OEE_DAYS - 1);
+  const rangeStart = daysAgo(Math.max(OEE_DAYS, SCRAP_DAYS) - 1);
 
   const [
     inspectorsRes,
@@ -152,6 +153,23 @@ export default async function ProduccionPage() {
     resultsRes.rows.map((r) => [dateKey(r.day), { ok: Number(r.ok), ng: Number(r.ng) }])
   );
 
+  const scrapByDay = new Map<string, number>();
+  for (const s of scrapRes.rows) {
+    const key = dateKey(s.scrap_date);
+    scrapByDay.set(key, (scrapByDay.get(key) ?? 0) + s.quantity);
+  }
+
+  const scrapTrend: ScrapTrendPoint[] = Array.from({ length: SCRAP_DAYS }, (_, i) => {
+    const d = daysAgo(SCRAP_DAYS - 1 - i);
+    const key = isoDate(d);
+    const actualPieces = actualByDay.get(key)?.pieces ?? 0;
+    const scrapQty = scrapByDay.get(key) ?? 0;
+    return {
+      label: d.toLocaleDateString("es-MX", { day: "numeric", month: "short" }),
+      pct: actualPieces > 0 ? (scrapQty / actualPieces) * 100 : null,
+    };
+  });
+
   const days: OeeDayRow[] = Array.from({ length: OEE_DAYS }, (_, i) => {
     const d = daysAgo(OEE_DAYS - 1 - i);
     const key = isoDate(d);
@@ -210,6 +228,7 @@ export default async function ProduccionPage() {
           clients={clientsRes.rows}
           orders={orderOptionsRes.rows}
         />
+        <ScrapTrendChart points={scrapTrend} />
 
         <div>
           <h2 className="mb-1 text-sm font-bold tracking-wide text-ink-700 uppercase">
