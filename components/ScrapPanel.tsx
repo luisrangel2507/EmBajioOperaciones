@@ -55,6 +55,26 @@ export default function ScrapPanel({
   }
   const topReason = [...reasonTotals.entries()].sort((a, b) => b[1] - a[1])[0];
 
+  // Pivote: piezas en filas, motivos usados en columnas (igual que el reporte de Plex)
+  const usedReasons = SCRAP_REASONS.filter((r) => reasonTotals.has(r));
+  const byPart = new Map<
+    string,
+    { partName: string; partNumber: string | null; byReason: Map<string, number>; total: number }
+  >();
+  for (const r of records) {
+    const key = `${r.part_name}|${r.part_number ?? ""}`;
+    const entry = byPart.get(key) ?? {
+      partName: r.part_name,
+      partNumber: r.part_number,
+      byReason: new Map<string, number>(),
+      total: 0,
+    };
+    entry.byReason.set(r.reason, (entry.byReason.get(r.reason) ?? 0) + r.quantity);
+    entry.total += r.quantity;
+    byPart.set(key, entry);
+  }
+  const partRows = [...byPart.values()].sort((a, b) => b.total - a.total);
+
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
     setFormError(null);
@@ -137,7 +157,58 @@ export default function ScrapPanel({
         </div>
       </div>
 
+      {partRows.length > 0 && (
+        <div className="overflow-x-auto rounded-xl border border-kraft-200 bg-white shadow-sm">
+          <p className="border-b border-kraft-100 px-4 py-2.5 text-xs font-bold tracking-widest text-ink-500/50 uppercase">
+            Desechos por pieza
+          </p>
+          <table className="min-w-full divide-y divide-kraft-200 text-sm">
+            <thead className="bg-kraft-50">
+              <tr>
+                <Th>Pieza</Th>
+                {usedReasons.map((r) => (
+                  <Th key={r}>{r}</Th>
+                ))}
+                <Th>Total piezas</Th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-kraft-100">
+              {partRows.map((p) => (
+                <tr key={`${p.partName}|${p.partNumber ?? ""}`} className="hover:bg-olive-400/8">
+                  <td className="px-4 py-3 text-ink-700/80">
+                    <div className="font-medium text-ink-700">{p.partName}</div>
+                    {p.partNumber && (
+                      <div className="text-xs text-ink-500/50">{p.partNumber}</div>
+                    )}
+                  </td>
+                  {usedReasons.map((r) => (
+                    <td key={r} className="px-4 py-3 text-ink-700/80">
+                      {p.byReason.get(r) ?? 0}
+                    </td>
+                  ))}
+                  <td className="px-4 py-3 font-bold text-red-600">{p.total}</td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot className="border-t-2 border-kraft-200 bg-kraft-50 font-bold">
+              <tr>
+                <td className="px-4 py-3 text-ink-700">Total de todas las piezas</td>
+                {usedReasons.map((r) => (
+                  <td key={r} className="px-4 py-3 text-ink-700">
+                    {reasonTotals.get(r) ?? 0}
+                  </td>
+                ))}
+                <td className="px-4 py-3 text-red-600">{totalQty}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      )}
+
       <div className="overflow-x-auto rounded-xl border border-kraft-200 bg-white shadow-sm">
+        <p className="border-b border-kraft-100 px-4 py-2.5 text-xs font-bold tracking-widest text-ink-500/50 uppercase">
+          Registros individuales
+        </p>
         <table className="min-w-full divide-y divide-kraft-200 text-sm">
           <thead className="bg-kraft-50">
             <tr>
