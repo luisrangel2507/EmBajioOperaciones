@@ -3,11 +3,11 @@ import { getSession } from "@/lib/auth";
 import { query } from "@/lib/db";
 import { ADMIN_NAV_ITEMS } from "@/lib/adminNav";
 import AppShell from "@/components/AppShell";
-import RotationGrid from "@/components/RotationGrid";
-import OeeDashboard, { type OeeDayRow } from "@/components/OeeDashboard";
-import OrdersDashboard, { type OrderRow } from "@/components/OrdersDashboard";
-import ScrapPanel, { type ScrapRow, type OrderOption } from "@/components/ScrapPanel";
-import ScrapTrendChart, { type DailyActual } from "@/components/ScrapTrendChart";
+import ProduccionHub from "@/components/ProduccionHub";
+import { type OeeDayRow } from "@/components/OeeDashboard";
+import { type OrderRow } from "@/components/OrdersDashboard";
+import { type ScrapRow, type OrderOption } from "@/components/ScrapPanel";
+import { type DailyActual } from "@/components/ScrapTrendChart";
 
 const SCRAP_DAYS = 30;
 
@@ -189,55 +189,15 @@ export default async function ProduccionPage() {
       userName={session.name}
       navItems={ADMIN_NAV_ITEMS}
     >
-      <div className="space-y-8">
-        <OeeDashboard initialDays={days} />
-
-        <div>
-          <h2 className="mb-1 text-sm font-bold tracking-wide text-ink-700 uppercase">
-            📦 Ordenes en produccion
-          </h2>
-          <p className="text-xs text-ink-500/60">
-            Ordenes pendientes o en proceso. Puedes cargar una nueva orden directamente desde
-            aqui.
-          </p>
-        </div>
-        <OrdersDashboard
-          initialOrders={ordersRes.rows}
-          clients={clientsRes.rows}
-          inspectors={inspectorsRes.rows}
-          defaultStatus="pendiente,en_proceso"
-        />
-
-        <div>
-          <h2 className="mb-1 text-sm font-bold tracking-wide text-ink-700 uppercase">
-            🗑️ Desechos / Scrap
-          </h2>
-          <p className="text-xs text-ink-500/60">
-            Registra piezas desechadas por estacion y motivo. Ultimos {SCRAP_DAYS} dias.
-          </p>
-        </div>
-        <ScrapPanel
-          initialRecords={scrapRes.rows}
-          clients={clientsRes.rows}
-          orders={orderOptionsRes.rows}
-        />
-        <ScrapTrendChart
-          records={scrapRes.rows}
-          dailyActual={dailyActual}
-          clients={clientsRes.rows}
-        />
-
-        <div>
-          <h2 className="mb-1 text-sm font-bold tracking-wide text-ink-700 uppercase">
-            🔄 Rotacion de estaciones
-          </h2>
-          <p className="text-xs text-ink-500/60">
-            Asigna que inspector cubre cada estacion por horario. Los cambios se guardan
-            automaticamente.
-          </p>
-        </div>
-        <RotationGrid inspectors={inspectorsRes.rows} />
-      </div>
+      <ProduccionHub
+        oeeDays={days}
+        orders={ordersRes.rows}
+        clients={clientsRes.rows}
+        inspectors={inspectorsRes.rows}
+        scrapRecords={scrapRes.rows}
+        scrapOrders={orderOptionsRes.rows}
+        dailyActual={dailyActual}
+      />
     </AppShell>
   );
 }
