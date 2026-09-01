@@ -1,7 +1,7 @@
 export const ADMIN_NAV_ITEMS = [
   { label: "Ordenes", href: "/admin" },
   { label: "Produccion", href: "/admin/produccion" },
-  { label: "Facturacion", soon: true },
+  { label: "Facturacion", href: "/admin/facturacion" },
   { label: "RH / Turnos", href: "/admin/rh" },
   { label: "Calidad", href: "/admin/calidad" },
 ];
